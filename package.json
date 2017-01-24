@@ -18,7 +18,7 @@
     "rest",
     "api"
   ],
-  "main": "kyruus.js",
+  "main": "kyruus-sdk.js",
   "scripts": {
     "mocha": "mocha",
     "test": "npm run lint && mocha",
@@ -42,6 +42,6 @@
     "dotenv": "^2.0.0",
     "jscs": "^2.3.5",
     "mocha": "~2.1.0",
-    "stripe-javascript-style": "^1.0.1",
+    "stripe-javascript-style": "^1.0.1"
   }
 }
