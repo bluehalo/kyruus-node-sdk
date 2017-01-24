@@ -1,6 +1,6 @@
 'use strict';
 const https = require('https'),
-    q = require('Q');
+    q = require('q');
 
 class Kyruus {
 
@@ -23,12 +23,7 @@ class Kyruus {
      * @return {Promise.<TResult>|*}
      */
     getDoctorByNpi(npi) {
-        let options = {
-            hostname: this.endpoint,
-            path: '/pm/v8/' + this.source + '/providers?npi=' + encodeURIComponent(npi)
-        };
-
-        return this._https(options).then(result => {
+        return this.search('?npi=' + encodeURIComponent(npi)).then(result => {
             return _.get(result, 'providers[0]', result);
         });
     }
@@ -159,7 +154,15 @@ class Kyruus {
             options.Authorization = options.Authorization || `${this._token.token_type} ${this._token.access_token}`;
         }
 
-        return options
+        return options;
+    }
+    
+    querryKyruus(options, body) {
+        options = this._generateDefaultOptions(options);
+
+        this._refreshToken().then(() => {
+            return this._https(options, body);
+        });
     }
 
     /**
@@ -170,9 +173,8 @@ class Kyruus {
      * @private
      */
     _https(options, body) {
-        options = this._generateDefaultOptions(options);
 
-        return this._refreshToken().then(() => {
+        return q.Promise((resolve, reject) => {
             let req = https.request(options, res => {
                 let str = '';
 
@@ -185,19 +187,19 @@ class Kyruus {
                             let result = JSON.parse(str);
 
                             if (response.statusCode >= 400) {
-                                return q.reject(req.results.message || str);
+                                return reject(req.results.message || str);
                             }
                         } catch (e) {
-                            return q.reject(e);
+                            return reject(e);
                         }
 
-                        return q.resolve(q.result);
+                        return resolve(q.result);
                     })
                     .on('error', function (e) {
-                        return q.reject(e);
+                        return reject(e);
                     });
             }).on('error', function (e) {
-                return q.reject(e);
+                return reject(e);
             });
 
             if (body) {
