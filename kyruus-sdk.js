@@ -13,8 +13,6 @@ class Kyruus {
         this._token = null;
         this._expiresAt = (new Date()).getTime();
         this._refreshTokenLock = false;
-
-        return this._refreshToken();
     }
 
     /**
@@ -93,7 +91,7 @@ class Kyruus {
             path: `/pm/v8/${this.source}/${path}${(searchString ? '?' + searchString : '')}`
         };
 
-        return this._https(this._generateDefaultOptions(options));
+        return this._refreshToken().then(() => {return this._https(this._generateDefaultOptions(options));});
     }
 
     /**
@@ -104,26 +102,21 @@ class Kyruus {
      * @private
      */
     _refreshToken() {
-        if (this._expiresAt < (new Date()).getTime() - 60000) {
-            q(this);
-        }
-
-        // Is a new access token already being requested
-        if (this._refreshTokenLock) {
-            return this._refreshTokenLock = q(this._refreshTokenLock);
+        if (this._expiresAt >= (new Date()).getTime() - 60000 && this._refreshTokenLock) {
+            return this._refreshTokenLock;
         }
 
         let options = {
             "method": "POST",
-            "hostname": "preview-api.kyruus.com",
+            "hostname": this.endpoint,
             "port": null,
             "path": "/oauth2/token",
             "headers": {
                 "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
                 "cache-control": "no-cache"
             }},
-            body = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_id\"\r\n\r\nmedstar_fad_website\r\n"
-             + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_secret\"\r\n\r\na0c7336a97ce4e1f962cdf63f7679f19\r\n"
+            body = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_id\"\r\n\r\n" + this._userName + "\r\n"
+             + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_secret\"\r\n\r\n" + this._userPassword + "\r\n"
              + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"grant_type\"\r\n\r\nclient_credentials\r\n"
              + "------WebKitFormBoundary7MA4YWxkTrZu0gW--";
 
@@ -134,9 +127,7 @@ class Kyruus {
             // Set the new session expiration timestamp
             this._expiresAt = (new Date()).getTime() + (_.get(result, 'expires_in', (new Date()).getTime()) * 1000);
 
-            return this;
-        }).finally(() => {
-            this._refreshTokenLock = false;
+            return q(result);
         });
     }
 
