@@ -68,17 +68,23 @@ class Kyruus {
     suggest(suggester, typeAheadCategory) {
         typeAheadCategory = (typeAheadCategory ? '&typeahead_categories=' + encodeURIComponent(typeAheadCategory) : '');
 
-        let optionsOne = {
-                hostname: this.endpoint,
-                path: '/pm/v8/' + this.source + '/typeahead?terms=' + encodeURIComponent(suggester) + typeAheadCategory
-            },
-            optionsTwo = {
-                hostname: this.endpoint,
-                path: '/pm/v8/' + this.source + '/providers?name=' + encodeURIComponent(suggester)
-            };
+        let optionsOne = 'terms=' + encodeURIComponent(suggester) + typeAheadCategory,
+            optionsTwo = 'name=' + encodeURIComponent(suggester);
 
-        return q.all([this._https(optionsOne), this._https(optionsTwo)]).spread((autoComplete, suggestions) => {
-            return [];
+        return q.all([this.search(optionsOne, 'typeahead'), this.search(optionsTwo)]).spread((autoComplete, suggestions) => {
+            suggestions = suggestions.suggestions;
+            for (let suggestion of autoComplete.exact.docs) {
+                let value = suggestion.content_type === 'name' ? suggestion.value : suggestion.name;
+
+                if (_.get(suggestions, suggestion.content_type, false)) {
+                    suggestions[suggestion.content_type][0].suggestions.push(value);
+                }
+                else {
+                    suggestions[suggestion.content_type] = [{suggestions: [value], term: suggester}];
+                }
+            }
+
+            return suggestions;
         });
     }
 
@@ -88,10 +94,10 @@ class Kyruus {
      * @param searchString
      * @return {promise|d.promise|*|r.promise}
      */
-    search(searchString) {
+    search(searchString = null, path = 'providers') {
         let options = {
             hostname: this.endpoint,
-            path: '/pm/v8/' + this.source + '/providers' + (searchString ? `?${searchString}` : '')
+            path: `/pm/v8/${this.source}/${path}${(searchString ? '?' + searchString : '')}`
         };
 
         return this._https(this._generateDefaultOptions(options));
