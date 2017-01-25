@@ -10,9 +10,19 @@ class Kyruus {
         this.source = source;
         this._userName = user;
         this._userPassword = password;
-        this._token = null;
-        this._expiresAt = (new Date()).getTime();
-        this._refreshTokenLock = false;
+        this._token = undefined;
+        this._expiresAt = 0;
+        this._refreshTokenLock = null;
+    }
+
+    /**
+     * @function __getTimeInSeconds
+     * @summary returns the current time in seconds
+     * @return {number}
+     * @private
+     */
+    __getTimeInSeconds() {
+        return (new Date()).getTime() / 1000;
     }
 
     /**
@@ -68,7 +78,7 @@ class Kyruus {
                 let value = suggestion.content_type === 'name' ? suggestion.value : suggestion.name;
 
                 if (_.get(suggestions, suggestion.content_type, false)) {
-                    suggestions[suggestion.content_type][0].suggestions.push(value);
+                    suggestions[suggestion.content_type][0].suggestions = _.union(suggestions[suggestion.content_type][0].suggestions, [value]);
                 }
                 else {
                     suggestions[suggestion.content_type] = [{suggestions: [value], term: suggester}];
@@ -102,9 +112,14 @@ class Kyruus {
      * @private
      */
     _refreshToken() {
-        if (this._expiresAt >= (new Date()).getTime() - 60000 && this._refreshTokenLock) {
+        if (this._expiresAt >= this.__getTimeInSeconds() - 60 && this._token != undefined && this._refreshTokenLock) {
             return this._refreshTokenLock;
         }
+        else if (this._token === null && this._refreshTokenLock) {
+            return this._refreshTokenLock;
+        }
+
+        this._token = null;
 
         let options = {
             "method": "POST",
@@ -120,12 +135,11 @@ class Kyruus {
              + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"grant_type\"\r\n\r\nclient_credentials\r\n"
              + "------WebKitFormBoundary7MA4YWxkTrZu0gW--";
 
-
         return this._refreshTokenLock = this._https(options, body).then(result => {
             this._token = result;
 
             // Set the new session expiration timestamp
-            this._expiresAt = (new Date()).getTime() + (_.get(result, 'expires_in', (new Date()).getTime()) * 1000);
+            this._expiresAt = this.__getTimeInSeconds() + (_.get(result, 'expires_in', this.__getTimeInSeconds()));
 
             return q(result);
         });
