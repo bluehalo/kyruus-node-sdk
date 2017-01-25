@@ -94,7 +94,7 @@ class Kyruus {
             path: '/pm/v8/' + this.source + '/providers' + (searchString ? `?${searchString}` : '')
         };
 
-        return this._https(options);
+        return this._https(this._generateDefaultOptions(options));
     }
 
     /**
@@ -113,8 +113,6 @@ class Kyruus {
         if (this._refreshTokenLock) {
             return this._refreshTokenLock = q(this._refreshTokenLock);
         }
-
-        this._token = null;
 
         let options = {
             "method": "POST",
@@ -164,14 +162,6 @@ class Kyruus {
 
         return options;
     }
-    
-    querryKyruus(options, body) {
-        options = this._generateDefaultOptions(options);
-
-        this._refreshToken().then(() => {
-            return this._https(options, body);
-        });
-    }
 
     /**
      * @function _https
@@ -182,7 +172,7 @@ class Kyruus {
      */
     _https(options, body) {
         return q.Promise((resolve, reject) => {
-            let req = https.request(this._generateDefaultOptions(options), res => {
+            let req = https.request(options, res => {
                 let str = '';
 
                 // Another chunk of data has been received, so append it to 'str'
