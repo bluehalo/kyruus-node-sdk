@@ -47,14 +47,8 @@ class Kyruus {
      * @param distance
      * @return {Promise.<TResult>|*}
      */
-    // TODO: Finish this function
     searchByLocation(location, distance) {
-        let options = {
-            hostname: this.endpoint,
-            path: '/pm/v8/' + this.source + '/providers'
-        };
-
-        return this._https(options);
+        return this.search(`location=${encodeURIComponent(location)}&distance=${encodeURIComponent(distance)}`);
     }
 
     /**
@@ -64,7 +58,6 @@ class Kyruus {
      * @param typeAheadCategory
      * @return {Function|*}
      */
-    // TODO: Finish implementing this
     suggest(suggester, typeAheadCategory) {
         typeAheadCategory = (typeAheadCategory ? '&typeahead_categories=' + encodeURIComponent(typeAheadCategory) : '');
 
