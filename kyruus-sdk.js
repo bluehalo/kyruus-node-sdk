@@ -1,6 +1,7 @@
 'use strict';
 const https = require('https'),
-    q = require('q');
+    q = require('q'),
+    _ = require('lodash');
 
 class Kyruus {
 
@@ -23,7 +24,7 @@ class Kyruus {
      * @return {Promise.<TResult>|*}
      */
     getDoctorByNpi(npi) {
-        return this.search('?npi=' + encodeURIComponent(npi)).then(result => {
+        return this.search('npi=' + encodeURIComponent(npi)).then(result => {
             return _.get(result, 'providers[0]', result);
         });
     }
@@ -113,6 +114,8 @@ class Kyruus {
             return this._refreshTokenLock = q(this._refreshTokenLock);
         }
 
+        this._token = null;
+
         let options = {
             "method": "POST",
             "hostname": "preview-api.kyruus.com",
@@ -153,7 +156,10 @@ class Kyruus {
         options.method = options.method || 'GET';
 
         if (this._token) {
-            options.Authorization = options.Authorization || `${this._token.token_type} ${this._token.access_token}`;
+            if (!options.headers) {
+                options.headers = {};
+            }
+            options.headers.Authorization = options.headers.Authorization || `${this._token.token_type} ${this._token.access_token}`;
         }
 
         return options;
@@ -176,7 +182,7 @@ class Kyruus {
      */
     _https(options, body) {
         return q.Promise((resolve, reject) => {
-            let req = https.request(options, res => {
+            let req = https.request(this._generateDefaultOptions(options), res => {
                 let str = '';
 
                 // Another chunk of data has been received, so append it to 'str'
