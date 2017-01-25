@@ -4,7 +4,7 @@ const https = require('https'),
 
 class Kyruus {
 
-    constructor({endpoint = '', source = '', user = '', password = ''}) {
+    constructor(endpoint = '', source = '', user = '', password = '') {
         this.endpoint = endpoint;
         this.source = source;
         this._userName = user;
@@ -114,22 +114,25 @@ class Kyruus {
         }
 
         let options = {
-                hostname: this._endpoint,
-                path: '/oauth2/token',
-                method: 'POST',
-            },
-            body = {
-                client_id: this._userName,
-                client_secret: this._userPassword,
-                grant_type: 'client_credentials'
-            };
+            "method": "POST",
+            "hostname": "preview-api.kyruus.com",
+            "port": null,
+            "path": "/oauth2/token",
+            "headers": {
+                "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+                "cache-control": "no-cache"
+            }},
+            body = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_id\"\r\n\r\nmedstar_fad_website\r\n"
+             + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_secret\"\r\n\r\na0c7336a97ce4e1f962cdf63f7679f19\r\n"
+             + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"grant_type\"\r\n\r\nclient_credentials\r\n"
+             + "------WebKitFormBoundary7MA4YWxkTrZu0gW--";
 
 
         return this._refreshTokenLock = this._https(options, body).then(result => {
             this._token = result;
 
-            // Set the new session expiration timestamp. Give 20 seconds room for possible internet delay
-            this._expiresAt = (new Date()).getTime() + (result.expires_in * 1000);
+            // Set the new session expiration timestamp
+            this._expiresAt = (new Date()).getTime() + (_.get(result, 'expires_in', (new Date()).getTime()) * 1000);
 
             return this;
         }).finally(() => {
@@ -146,9 +149,8 @@ class Kyruus {
      */
     _generateDefaultOptions(options) {
         options.hostname = options.hostname || this.endpoint + '/pm/v8/' + this.source + '/providers';
-        options.auth = options.auth || this._userName+':' + this._userPassword;
         options.port = options.port || 443;
-        options.mehod = options.mehod || 'GET';
+        options.method = options.method || 'GET';
 
         if (this._token) {
             options.Authorization = options.Authorization || `${this._token.token_type} ${this._token.access_token}`;
@@ -173,7 +175,6 @@ class Kyruus {
      * @private
      */
     _https(options, body) {
-
         return q.Promise((resolve, reject) => {
             let req = https.request(options, res => {
                 let str = '';
@@ -183,22 +184,26 @@ class Kyruus {
                     str += chunk;
                 })
                     .on('end', function () {
-                        try {
-                            let result = JSON.parse(str);
+                        if (res.statusCode >= 400) {
+                            return reject(res.statusMessage || str);
+                        }
+                        let result = {};
 
-                            if (response.statusCode >= 400) {
-                                return reject(req.results.message || str);
-                            }
+                        try {
+                            result = JSON.parse(str);
+
                         } catch (e) {
                             return reject(e);
                         }
 
-                        return resolve(q.result);
+                        return resolve(result);
                     })
                     .on('error', function (e) {
                         return reject(e);
                     });
-            }).on('error', function (e) {
+            });
+
+            req.on('error', function (e) {
                 return reject(e);
             });
 
