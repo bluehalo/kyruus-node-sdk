@@ -1,13 +1,15 @@
 'use strict';
 const https = require('https'),
+    crypto = require('crypto'),
     q = require('q'),
     _ = require('lodash');
 
 class Kyruus {
 
-    constructor(endpoint = '', source = '', user = '', password = '') {
+    constructor(endpoint = '', source = '', version = '', user = '', password = '') {
         this.endpoint = endpoint;
         this.source = source;
+        this.version = version;
         this._userName = user;
         this._userPassword = password;
         this._token = undefined;
@@ -26,6 +28,16 @@ class Kyruus {
     }
 
     /**
+     * @function __rootPath
+     * @summary returns the root path to the Kyruus api
+     * @return {string}
+     * @private
+     */
+    __rootPath() {
+        return `/pm/${this.version}/${this.source}/`;
+    }
+
+    /**
      * @function getDoctorByNpi
      * @summary return a kyruus doctor object searched by npi
      * @param npi
@@ -33,7 +45,8 @@ class Kyruus {
      */
     getDoctorByNpi(npi) {
         return this.search('npi=' + encodeURIComponent(npi)).then(result => {
-            return _.get(result, 'providers[0]', result);
+            // This doctor only ever be absent if the npi does not map to a doctor
+            return _.get(result, 'providers[0]', q.reject('NPI does not map to a doctor'));
         });
     }
 
@@ -44,7 +57,7 @@ class Kyruus {
      */
     getAllFacets() {
         return this.search().then(result => {
-            return _.get(result, 'facets', []);
+            return result.facets;
         });
     }
 
@@ -98,7 +111,7 @@ class Kyruus {
     search(searchString = null, path = 'providers') {
         let options = {
             hostname: this.endpoint,
-            path: `/pm/v8/${this.source}/${path}${(searchString ? '?' + searchString : '')}`
+            path: this.__rootPath() + path + (searchString ? '?' + searchString : '')
         };
 
         return this._refreshToken().then(() => {return this._https(this._generateDefaultOptions(options));});
@@ -112,7 +125,7 @@ class Kyruus {
      * @private
      */
     _refreshToken() {
-        if (this._expiresAt >= this.__getTimeInSeconds() - 60 && this._token != undefined && this._refreshTokenLock) {
+        if (this._expiresAt >= this.__getTimeInSeconds() - 60 && this._token !== undefined && this._refreshTokenLock) {
             return this._refreshTokenLock;
         }
         else if (this._token === null && this._refreshTokenLock) {
@@ -121,25 +134,31 @@ class Kyruus {
 
         this._token = null;
 
+        let separator = `-----WebKitFormBoundary${crypto.randomBytes(7).toString('hex')}`;
+
         let options = {
             "method": "POST",
             "hostname": this.endpoint,
             "port": null,
             "path": "/oauth2/token",
             "headers": {
-                "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+                "content-type": "multipart/form-data; boundary=" + separator,
                 "cache-control": "no-cache"
-            }},
-            body = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_id\"\r\n\r\n" + this._userName + "\r\n"
-             + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_secret\"\r\n\r\n" + this._userPassword + "\r\n"
-             + "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"grant_type\"\r\n\r\nclient_credentials\r\n"
-             + "------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+            }};
+        
+        separator = '--' + separator;
+
+        // This is the body of the form request Kyruus uses to login
+        let body = separator + "\r\nContent-Disposition: form-data; name=\"client_id\"\r\n\r\n" + this._userName + "\r\n"
+             + separator + "\r\nContent-Disposition: form-data; name=\"client_secret\"\r\n\r\n" + this._userPassword + "\r\n"
+             + separator + "\r\nContent-Disposition: form-data; name=\"grant_type\"\r\n\r\nclient_credentials\r\n"
+             + separator + "--";
 
         return this._refreshTokenLock = this._https(options, body).then(result => {
             this._token = result;
 
             // Set the new session expiration timestamp
-            this._expiresAt = this.__getTimeInSeconds() + (_.get(result, 'expires_in', this.__getTimeInSeconds()));
+            this._expiresAt = this.__getTimeInSeconds() + (_.get(result, 'expires_in', 0));
 
             return q(result);
         });
@@ -153,7 +172,7 @@ class Kyruus {
      * @private
      */
     _generateDefaultOptions(options) {
-        options.hostname = options.hostname || this.endpoint + '/pm/v8/' + this.source + '/providers';
+        options.hostname = options.hostname || `${this.__rootPath()}providers`;
         options.port = options.port || 443;
         options.method = options.method || 'GET';
 
@@ -175,6 +194,8 @@ class Kyruus {
      * @private
      */
     _https(options, body) {
+        console.log(options);
+        console.log(body);
         return q.Promise((resolve, reject) => {
             let req = https.request(options, res => {
                 let str = '';
