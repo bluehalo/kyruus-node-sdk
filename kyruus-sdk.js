@@ -224,12 +224,7 @@ class Kyruus {
     getProviderByNpi(npi) {
         return this.search('filter=npi:' + encodeURIComponent(npi)).then(result => {
             // This doctor only ever be absent if the npi does not map to a doctor
-            return _.get(result, 'providers[0]', q.reject(() => {
-                let err = new Error('NPI does not map to a doctor');
-                err.code = 404;
-
-                return err;
-            }));
+            return _.get(result, 'providers[0]', null);
         });
     }
 
