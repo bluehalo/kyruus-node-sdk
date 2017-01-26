@@ -12,6 +12,12 @@ const https = require('https'),
  * @property {number} count - number of doctors with this term for the parent facet
  * @property {string} value - value of the matching term
  */
+class FacetTerm {
+    constructor(count, value) {
+        this.count = count;
+        this.value = value;
+    }
+}
 
 /**
  * A single Kyruus facet Object. For more information about facets, see:
@@ -23,14 +29,23 @@ const https = require('https'),
  * @property {FacetTerm[]} terms - Array of all matching terms
  * @property {number} count - sum of all FacetTerm counts
  */
+class KyruusFacet {
+    constructor(field, missing, other, terms, count) {
+        this.field = field;
+        this.missing = missing;
+        this.other = other;
+        this.terms = terms;
+        this.count = count;
+    }
+}
 
 /**
  * Kyruus location Object
  * @typedef {Object} KyruusLocation
  * @property {string} city
  * @property {string} county
- * @property {string} fips
- * @property {string} plus4
+ * @property {string} fips - TBD
+ * @property {string} plus4 - TBD
  * @property {string} state
  * @property {string} street
  * @property {string} street2
@@ -38,6 +53,18 @@ const https = require('https'),
  * @property {string} type
  * @property {string} zip
  */
+class KyruusLocation {
+    constructor(city, county, fips, plus4, state, street, street2, suite) {
+        this.city = city;
+        this.county = county;
+        this.fips = fips;
+        this.plus4 = plus4;
+        this.state = state;
+        this.street = street;
+        this.street2 = street2;
+        this.suite = suite;
+    }
+}
 
 /**
  * GeoCode Location Object returned by Kyruus
@@ -46,6 +73,12 @@ const https = require('https'),
  * @property {number} coordinates.lon - Lon coordinate of the location
  * @property {KyruusLocation} location - location Object for the filter if a location was passed in
  */
+class KyruusGeoCode {
+    constructor(coordinates, location) {
+        this.coordinates = coordinates;
+        this.location = location;
+    }
+}
 
 /**
  * Kyruus suggestion Object data
@@ -53,17 +86,35 @@ const https = require('https'),
  * @property {string[]} suggestions - Array of all possible suggestions
  * @property {string} term - search phrase entered for the current suggestions
  */
+class KyruusSuggestionData {
+    constructor(suggestions, term) {
+        this.suggestions = suggestions;
+        this.term = term;
+    }
+}
 
 /**
  * Kyruus suggestion Object
  * @typedef {Object} KyruusSuggestions
  * @property {KyruusSuggestionData[]} [name] - an array of one KyruusSuggestionData Object
  */
+class KyruusSuggestions {
+    constructor(values) {
+        _.each(values, (value, key) => {
+            this[key] = value;
+        })
+    }
+}
 
 /**
  * Kyruus Provider object
  * @typedef {Object} KyruusProvider
  */
+class KyruusProvider {
+    constructor() {
+
+    }
+}
 
 /**
  * A complete search response from Kyruus on the providers endpoint
@@ -77,6 +128,18 @@ const https = require('https'),
  * @property {KyruusSuggestions} suggestions - The suggestion Object returned by Kyruus
  * @property {number} total_providers - Total number of matching providers
  */
+class KyruusProviderSearch {
+    constructor(alerts, availability_format, facets, geocoded_location, interpretation, providers, suggestions, total_providers) {
+        this.alerts = alerts;
+        this.availability_format = availability_format;
+        this.facets = facets;
+        this.geocoded_location = geocoded_location;
+        this.interpretation = interpretation;
+        this.providers = providers;
+        this.suggestions = suggestions;
+        this.total_providers = total_providers;
+    }
+}
 
 /**
  * Kyruus typeahead Object containing the autocomplete data
@@ -84,8 +147,16 @@ const https = require('https'),
  * @property {string} content_type - Content type the autocomplete came from
  * @property {string} value - Value used from the autocomplete
  * @property {string} [in_what] - What section of the value the mach came from
- * @property {string} name - Human readable version of the value if the value field is present
+ * @property {string} [name] - Human readable version of the value if the value is not already
  */
+class KyruusTypeAheadObject {
+    constructor(content_type, value, in_what = undefined, name = undefined) {
+        this.content_type = content_type;
+        this.value = value;
+        this.in_what = in_what;
+        this.name = name;
+    }
+}
 
 /**
  * Kyruus typeahead (autocomplete) Object return by the api
@@ -93,6 +164,11 @@ const https = require('https'),
  * @property {KyruusTypeAheadObject[]} exact.docs - Array of all possible
  * @property {number} exact.total - size of docs array
  */
+class KyruusTypeAhead {
+    constructor(exact) {
+        this.exact = exact;
+    }
+}
 
 /**
  * Default request options for Kyruus search
@@ -142,7 +218,7 @@ class Kyruus {
      * @function getProviderByNpi
      * @summary return a kyruus doctor object searched by npi
      * @param {number} npi - The doctor's npi
-     * @return {Promise.<KryuusProvider, Object>|*}
+     * @return {Promise.<KyruusProvider, Object>|*}
      * Deprecated
      */
     getProviderByNpi(npi) {
