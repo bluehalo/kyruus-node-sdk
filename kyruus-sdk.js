@@ -139,13 +139,14 @@ class Kyruus {
     }
 
     /**
-     * @function getDoctorByNpi
+     * @function getProviderByNpi
      * @summary return a kyruus doctor object searched by npi
      * @param {number} npi - The doctor's npi
      * @return {Promise.<KryuusProvider, Object>|*}
+     * Deprecated
      */
-    getDoctorByNpi(npi) {
-        return this.search('npi=' + encodeURIComponent(npi)).then(result => {
+    getProviderByNpi(npi) {
+        return this.search('filter=npi:' + encodeURIComponent(npi)).then(result => {
             // This doctor only ever be absent if the npi does not map to a doctor
             return _.get(result, 'providers[0]', q.reject(() => {
                 let err = new Error('NPI does not map to a doctor');

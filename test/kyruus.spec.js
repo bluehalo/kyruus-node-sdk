@@ -75,12 +75,12 @@ describe('Kyruus SDK', () => {
                 }
             };
 
-        describe('getDoctorByNpi', function() {
+        describe('getProviderByNpi', function() {
 
             it('Should return a doctor for a valid npi', () => {
                 kyruuuuuus(q(kyruusSearchObject));
 
-                return Kyruus.getDoctorByNpi(1386998102).then(result => {
+                return Kyruus.getProviderByNpi(1386998102).then(result => {
                     should(result).equal(kyruusSearchObject.providers[0]);
                 });
             });
@@ -136,7 +136,7 @@ describe('Kyruus SDK', () => {
                 );
 
                 return q.all(_.map([1,2,3,4,5], item => {
-                    return Kyruus.getDoctorByNpi(1386998102);
+                    return Kyruus.getProviderByNpi(1386998102);
                 })).then(results => {
                     for(let result of results) {
                         should.exist(result);
