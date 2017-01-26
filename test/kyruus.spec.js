@@ -9,7 +9,7 @@ describe('Kyruus SDK', () => {
     const kyruuuuuus = (promise) => Kyruus._https = (options, body) => typeof promise == 'function' ? promise(options,body) : promise;
 
     beforeEach(() => {
-        Kyruus = new (require('../kyruus-sdk'))('preview-api.kyruus.com', 'medstar', '', '');
+        Kyruus = new (require('../kyruus-sdk'))('preview-api.kyruus.com', 'test');
     });
 
     describe('_refreshToken', () => {
@@ -131,14 +131,9 @@ describe('Kyruus SDK', () => {
                 Kyruus._expiresAt = 0;
 
                 // The delay allows the requests to queue up and all rely on the connection to Kyruus to be made
-                kyruuuuuus((options) => {
-                    if (options.path.indexOf('oauth') > -1)
-                        return q.Promise((resolve, reject) => {
-                            setTimeout(() => resolve({expires_in: 3600}), 100);
-                        });
-                    else
-                        return q(kyruusSearchObject);
-                });
+                kyruuuuuus((options) =>
+                    options.path.indexOf('oauth') > -1 ? q({expires_in: 3600}).delay(100) : q(kyruusSearchObject)
+                );
 
                 return q.all(_.map([1,2,3,4,5], item => {
                     return Kyruus.getDoctorByNpi(1386998102);

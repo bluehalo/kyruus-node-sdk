@@ -4,6 +4,105 @@ const https = require('https'),
     q = require('q'),
     _ = require('lodash');
 
+// Type Definitions
+// TODO find meaning of TBD Objects
+/**
+ * A term for a single facet
+ * @typedef {Object} FacetTerm
+ * @property {number} count - number of doctors with this term for the parent facet
+ * @property {string} value - value of the matching term
+ */
+
+/**
+ * A single Kyruus facet Object. For more information about facets, see:
+ * https://support.kyruus.com/hc/en-us/articles/207465666-ProviderMatch-API-Search#facets
+ * @typedef {Object} KyruusFacet
+ * @property {string} field - the facet name
+ * @property {number} missing - The number of matched doctors that do not match this facet
+ * @property {number} other
+ * @property {FacetTerm[]} terms - Array of all matching terms
+ * @property {number} count - sum of all FacetTerm counts
+ */
+
+/**
+ * Kyruus location Object
+ * @typedef {Object} KyruusLocation
+ * @property {string} city
+ * @property {string} county
+ * @property {string} fips
+ * @property {string} plus4
+ * @property {string} state
+ * @property {string} street
+ * @property {string} street2
+ * @property {string} suite
+ * @property {string} type
+ * @property {string} zip
+ */
+
+/**
+ * GeoCode Location Object returned by Kyruus
+ * @typedef {Object} KyruusGeoCode
+ * @property {number} coordinates.lat - Lat coordinate of the location
+ * @property {number} coordinates.lon - Lon coordinate of the location
+ * @property {KyruusLocation} location - location Object for the filter if a location was passed in
+ */
+
+/**
+ * Kyruus suggestion Object data
+ * @typedef {Object} KyruusSuggestionData
+ * @property {string[]} suggestions - Array of all possible suggestions
+ * @property {string} term - search phrase entered for the current suggestions
+ */
+
+/**
+ * Kyruus suggestion Object
+ * @typedef {Object} KyruusSuggestions
+ * @property {KyruusSuggestionData[]} [name] - an array of one KyruusSuggestionData Object
+ */
+
+/**
+ * Kyruus Provider object
+ * @typedef {object} KyruusProvider
+ */
+
+/**
+ * A complete search response from Kyruus on the providers endpoint
+ * @typedef {Object} KyruusProviderSearch
+ * @property {null} alerts - TBD
+ * @property {number} availability_format - TBD
+ * @property {KyruusFacet[]} facets - Available facets for the returned search results
+ * @property {KyruusGeoCode|Object} geocoded_location - geocoded location Object for the filter if a location was passed in
+ * @property {Object} interpretation - TBD
+ * @property {KyruusProvider[]} providers - Array of all matching providers (paged to 10 providers by default)
+ * @property {KyruusSuggestions} suggestions - The suggestion Object returned by Kyruus
+ * @property {number} total_providers - Total number of matching providers
+ */
+
+/**
+ * Kyruus typeahead Object containing the autocomplete data
+ * @typedef {Object} KyruusTypeAheadObject
+ * @property {string} content_type - Content type the autocomplete came from
+ * @property {string} value - Value used from the autocomplete
+ * @property {string} [in_what] - What section of the value the mach came from
+ * @property {string} name - Human readable version of the value if the value field is present
+ */
+
+/**
+ * Kyruus typeahead (autocomplete) Object return by the api
+ * @typedef {Object} KyruusTypeAhead
+ * @property {KyruusTypeAheadObject[]} exact.docs - Array of all possible
+ * @property {number} exact.total - size of docs array
+ */
+
+/**
+ * Default request options for Kyruus search
+ * @typedef {object} DefaultSearchOptions
+ * @property {string} hostname - root url of the target endpoint
+ * @property {number} [port=443] port - target port
+ * @property {string} [method=GET] method - Target restful method
+ * @property {string} [headers.Authorization] - Auth key for the query
+ */
+
 class Kyruus {
     get version() {
         return 'v8';
@@ -22,7 +121,7 @@ class Kyruus {
     /**
      * @function __getTimeInSeconds
      * @summary returns the current time in seconds
-     * @return {number}
+     * @return {number} The current time in seconds
      * @private
      */
     __getTimeInSeconds() {
@@ -30,20 +129,20 @@ class Kyruus {
     }
 
     /**
-     * @function __rootPath
+     * @function __rootQueryPath
      * @summary returns the root path to the Kyruus api
-     * @return {string}
+     * @return {string} The root query path to Kyruus
      * @private
      */
-    __rootPath() {
+    __rootQueryPath() {
         return `/pm/${this.version}/${this.source}/`;
     }
 
     /**
      * @function getDoctorByNpi
      * @summary return a kyruus doctor object searched by npi
-     * @param npi
-     * @return {Promise.<TResult>|*}
+     * @param {nubmer} npi - The doctor's npi
+     * @return {Promise.<KryuusProvider, Object>|*}
      */
     getDoctorByNpi(npi) {
         return this.search('npi=' + encodeURIComponent(npi)).then(result => {
@@ -55,7 +154,7 @@ class Kyruus {
     /**
      * @function getAllFacets
      * @summary returns all facet objects from kyruus for an empty search
-     * @return {Promise.<TResult>|*}
+     * @return {Promise.<KyruusFacet[]>|*}
      */
     getAllFacets() {
         return this.search().then(result => {
@@ -66,9 +165,9 @@ class Kyruus {
     /**
      * @function searchByLocation
      * @summary Returns a list of providers, facets, suggesters, etc within the given distance of a given location
-     * @param location
-     * @param distance
-     * @return {Promise.<TResult>|*}
+     * @param {string|number} location - Location to search against. Either "city, state" or zipcode
+     * @param {number} distance - Filter Boundary for how far a doctor can be from the location
+     * @return {Promise.<KyruusProviderSearch>|*}
      */
     searchByLocation(location, distance) {
         return this.search(`location=${encodeURIComponent(location)}&distance=${encodeURIComponent(distance)}`);
@@ -77,9 +176,9 @@ class Kyruus {
     /**
      * @function suggest
      * @summary Returns a list of suggestions generated by the kyruus suggesters and autocompletes
-     * @param suggester
-     * @param typeAheadCategory
-     * @return {Function|*}
+     * @param {string} suggester - Phrase to find suggestions for
+     * @param {string} [typeAheadCategory=null] - Kyruus typeahead category to search against
+     * @return {Promise.<KyruusSuggestions>|*}
      */
     suggest(suggester, typeAheadCategory = null) {
         typeAheadCategory = (typeAheadCategory ? '&typeahead_categories=' + encodeURIComponent(typeAheadCategory) : '');
@@ -94,6 +193,7 @@ class Kyruus {
                 // used for match and a name field for public view
                 let value = suggestion.content_type === 'name' ? suggestion.value : suggestion.name;
 
+                // Merge the two result objects into one array with the Kyruus suggester format
                 if (_.get(suggestions, suggestion.content_type, false)) {
                     suggestions[suggestion.content_type][0].suggestions = _.union(suggestions[suggestion.content_type][0].suggestions, [value]);
                 }
@@ -109,16 +209,16 @@ class Kyruus {
     /**
      * @function search
      * @summary Does a generic search with the parameters provided if any
-     * @param searchString
-     * @return {promise|d.promise|*|r.promise}
+     * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
+     * @return {Promise.<KyruusProviderSearch>|*}
      */
-    search(searchString = null, path = 'providers') {
+    search(searchString = '', path = 'providers') {
         let options = {
             hostname: this.endpoint,
-            path: this.__rootPath() + path + (searchString ? '?' + searchString : '')
+            path: this.__rootQueryPath() + path + (searchString.length ? '?' + searchString : '')
         };
 
-        return this._refreshToken().then(() => {return this._https(this._generateDefaultOptions(options));});
+        return this._refreshToken().then(() => this._https(this._generateDefaultOptions(options)));
     }
 
     /**
@@ -171,11 +271,11 @@ class Kyruus {
     /**
      * @function _generateDefaultOptions
      * @summary return an options object with enough information to return a 0 filter query on Kyruus
-     * @param options
-     * @return {*}
+     * @param {object} [options={}] options - http request options to check data for default values
+     * @return {DefaultSearchOptions}
      * @private
      */
-    _generateDefaultOptions(options) {
+    _generateDefaultOptions(options={}) {
         options.hostname = options.hostname || this.endpoint;
         options.port = options.port || 443;
         options.method = options.method || 'GET';
