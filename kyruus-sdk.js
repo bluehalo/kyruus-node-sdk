@@ -188,12 +188,14 @@ class Kyruus {
 
         return q.all([this.search(optionsOne, 'typeahead'), this.search(optionsTwo)]).spread((autoComplete, suggestions) => {
             suggestions = suggestions.suggestions;
+
+            // Map all KyruusTypeAhead suggestions into the KyruusSuggestions object
             for (let suggestion of autoComplete.exact.docs) {
                 // For names, the value will already be the public value where as all other fields have a value field
                 // used for match and a name field for public view
                 let value = suggestion.content_type === 'name' ? suggestion.value : suggestion.name;
 
-                // Merge the two result objects into one array with the Kyruus suggester format
+                // Merge the two result objects into one array with the KyruusSuggestions format
                 if (_.get(suggestions, suggestion.content_type, false)) {
                     suggestions[suggestion.content_type][0].suggestions = _.union(suggestions[suggestion.content_type][0].suggestions, [value]);
                 }
