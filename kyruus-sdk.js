@@ -62,7 +62,7 @@ const https = require('https'),
 
 /**
  * Kyruus Provider object
- * @typedef {object} KyruusProvider
+ * @typedef {Object} KyruusProvider
  */
 
 /**
@@ -96,7 +96,7 @@ const https = require('https'),
 
 /**
  * Default request options for Kyruus search
- * @typedef {object} DefaultSearchOptions
+ * @typedef {Object} DefaultSearchOptions
  * @property {string} hostname - root url of the target endpoint
  * @property {number} [port=443] port - target port
  * @property {string} [method=GET] method - Target restful method
@@ -141,7 +141,7 @@ class Kyruus {
     /**
      * @function getDoctorByNpi
      * @summary return a kyruus doctor object searched by npi
-     * @param {nubmer} npi - The doctor's npi
+     * @param {number} npi - The doctor's npi
      * @return {Promise.<KryuusProvider, Object>|*}
      */
     getDoctorByNpi(npi) {
@@ -278,7 +278,7 @@ class Kyruus {
     /**
      * @function _generateDefaultOptions
      * @summary return an options object with enough information to return a 0 filter query on Kyruus
-     * @param {object} [options={}] options - http request options to check data for default values
+     * @param {Object} [options={}] options - http request options to check data for default values
      * @return {DefaultSearchOptions}
      * @private
      */
