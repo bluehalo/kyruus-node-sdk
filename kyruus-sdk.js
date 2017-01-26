@@ -5,11 +5,13 @@ const https = require('https'),
     _ = require('lodash');
 
 class Kyruus {
+    get version() {
+        return 'v8';
+    }
 
-    constructor(endpoint = '', source = '', version = '', user = '', password = '') {
+    constructor(endpoint = '', source = '', user = '', password = '') {
         this.endpoint = endpoint;
         this.source = source;
-        this.version = version;
         this._userName = user;
         this._userPassword = password;
         this._token = undefined;
@@ -46,7 +48,7 @@ class Kyruus {
     getDoctorByNpi(npi) {
         return this.search('npi=' + encodeURIComponent(npi)).then(result => {
             // This doctor only ever be absent if the npi does not map to a doctor
-            return _.get(result, 'providers[0]', q.reject('NPI does not map to a doctor'));
+            return _.get(result, 'providers[0]', q.reject({status: 404, message: 'NPI does not map to a doctor'}));
         });
     }
 
@@ -79,7 +81,7 @@ class Kyruus {
      * @param typeAheadCategory
      * @return {Function|*}
      */
-    suggest(suggester, typeAheadCategory) {
+    suggest(suggester, typeAheadCategory = null) {
         typeAheadCategory = (typeAheadCategory ? '&typeahead_categories=' + encodeURIComponent(typeAheadCategory) : '');
 
         let optionsOne = 'terms=' + encodeURIComponent(suggester) + typeAheadCategory,
@@ -88,6 +90,8 @@ class Kyruus {
         return q.all([this.search(optionsOne, 'typeahead'), this.search(optionsTwo)]).spread((autoComplete, suggestions) => {
             suggestions = suggestions.suggestions;
             for (let suggestion of autoComplete.exact.docs) {
+                // For names, the value will already be the public value where as all other fields have a value field
+                // used for match and a name field for public view
                 let value = suggestion.content_type === 'name' ? suggestion.value : suggestion.name;
 
                 if (_.get(suggestions, suggestion.content_type, false)) {
@@ -172,7 +176,7 @@ class Kyruus {
      * @private
      */
     _generateDefaultOptions(options) {
-        options.hostname = options.hostname || `${this.__rootPath()}providers`;
+        options.hostname = options.hostname || this.endpoint;
         options.port = options.port || 443;
         options.method = options.method || 'GET';
 
@@ -194,8 +198,6 @@ class Kyruus {
      * @private
      */
     _https(options, body) {
-        console.log(options);
-        console.log(body);
         return q.Promise((resolve, reject) => {
             let req = https.request(options, res => {
                 let str = '';
@@ -206,7 +208,7 @@ class Kyruus {
                 })
                     .on('end', function () {
                         if (res.statusCode >= 400) {
-                            return reject(res.statusMessage || str);
+                            return reject({status: res.statusCode, message: res.statusMessage || str});
                         }
                         let result = {};
 
