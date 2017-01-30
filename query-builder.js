@@ -201,7 +201,7 @@ class k {
         if (this._filter[field]) {
             value = new FilterObject(value);
 
-            
+
             if (this._filter[field].checkType(conjunction)) {
                 this._filter[field].append(value);
             }
@@ -215,7 +215,7 @@ class k {
             this._filter[field] = value;
         }
 
-        this._currentFilter = value;
+        this._currentFilter = field;
 
         return this;
     }
