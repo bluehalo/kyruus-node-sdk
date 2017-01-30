@@ -193,7 +193,7 @@ class k {
      * @param {string} value - what to value to filter against in the field
      * @return {k}
      */
-    filterOther(field, value, conjunction) {
+    filterOther(field, value, conjunction = 'or') {
         if (value instanceof k) {
             value = k.filter;
         }
@@ -215,57 +215,91 @@ class k {
             this._filter[field] = value;
         }
 
-        this._currentFilter = field;
+        this._currentFilter = value;
 
         return this;
     }
 
-    npi(npi) {
-        return this.filterOther('npi', npi);
+    npi(...npis, conjunction = 'or') {
+        _.forEach(npis, (npi) => {
+            this.filterOther('npi', npi, conjunction);
+        });
+        return this;
     }
 
-    filterGender(gender) {
-        return this.filterOther('gender', gender);
+    filterGender(...genders, conjunction = 'or') {
+        _.forEach(genders, (gender) => {
+            this.filterOther('gender', gender, conjunction);
+        });
+        return this;
     }
 
-    filterLocationName(location) {
-        return this.filterOther('locations.name', location);
+    filterLocationName(...locations, conjunction = 'or') {
+        _.forEach(locations, (location) => {
+            this.filterOther('locations.name', location, conjunction);
+        });
+        return this;
+
     }
 
-    filterSpecialties(specialty) {
-        return this.filterOther('specialties.specialty.untouched', specialty)
+    filterSpecialties(...specialties, conjunction = 'or') {
+        _.forEach(specialties, (specialty) => {
+            this.filterOther('specialties.specialty.untouched', specialty, conjunction);
+        });
+        return this;
     }
 
-    filterSubSpecialties(specialty) {
-        return this.filterOther('specialties.subspecialty.untouched', specialty);
+    filterSubSpecialties(...specialties, conjunction = 'or') {
+        _.forEach(specialties, (specialty) => {
+            this.filterOther('specialties.subspecialty.untouched', specialty, conjunction);
+        });
+        return this;
     }
 
-    filterPracticeFocus(focus) {
-        return this.filterOther('specialties.practice_focus.untouched', focus);
+    filterPracticeFocus(...focuses, conjunction = 'or') {
+        _.forEach(focuses, (focus) => {
+            this.filterOther('specialties.practice_focus.untouched', focus, conjunction);
+        });
+        return this;
     }
 
-    filterLocationCity(city) {
-        return this.filterOther('locations.city', city);
+    filterLocationCity(...cities, conjunction = 'or') {
+        _.forEach(cities, (city) => {
+            this.filterOther('locations.city', city, conjunction);
+        });
+        return this;
     }
 
-    filterLanguage(language) {
-        return this.filterOther('languages.language', language);
+    filterLanguage(...languages, conjunction = 'or') {
+        _.forEach(languages, (language) => {
+            this.filterOther('languages.language', language, conjunction);
+        });
+        return this;
     }
 
     filterAcceptingNewPatients(accepts = true) {
         return this.filterOther('accepting_new_patients', accepts);
     }
 
-    and(value) {
-        return this.filterOther(this._currentFilter, value, 'and');
+    and(...values) {
+        _.forEach(values, (value) => {
+            return this.filterOther(this._currentFilter, value, 'and');
+        });
+        return this;
     }
 
-    or(value) {
-        return this.filterOther(this._currentFilter, value, 'or');
+    or(...values) {
+        _.forEach(values, (value) => {
+            this.filterOther(this._currentFilter, value, 'or');
+        });
+        return this;
     }
 
-    andObject(value) {
-        return this.filterOther(this._currentFilter, value, '^');
+    andObject(...values) {
+        _.forEach(values, (value) => {
+            this.filterOther(this._currentFilter, value, '^');
+        });
+        return this;
     }
 
 
