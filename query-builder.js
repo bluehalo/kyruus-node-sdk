@@ -100,7 +100,6 @@ class FilterObject {
      * @return {string}
      */
     toString() {
-        console.log(this._value);
         return _.join(this._value, this._type);
     }
 }
@@ -181,7 +180,6 @@ class k {
     vector(field, value) {
         this._vector['field'] = field;
         this._vector['value'] = value;
-        console.log(this._vector);
         return this;
     }
 
