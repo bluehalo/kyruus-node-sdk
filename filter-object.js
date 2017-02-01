@@ -1,0 +1,103 @@
+'use-strict';
+const _ = require('lodash');
+
+class FilterObject {
+    constructor(value, type = '') {
+        if (! _.isArray(this._value)) value = [value];
+        this._value = value;
+        this.setType(type);
+    }
+    /**
+     * @function getType
+     * @summary Returns the conjugation type (or(|) or and(^))
+     * @return {string}
+     */
+    getType() {
+        return this._type;
+    }
+
+    /**
+     * @function getType
+     * @summary Returns the number of filters in this object
+     * @return {number}
+     */
+    size() {
+        return this._value.length;
+    }
+
+    /**
+     * @function remove
+     * @summary Removes the value from the filter
+     * @param {string} value - value to remove
+     * @return {string}
+     */
+    remove(value) {
+        this.delete(value);
+    }
+
+    /**
+     * @function delete
+     * @summary Removes the value from the filter
+     * @param {string} value - value to remove
+     * @return {string}
+     */
+    delete(value) {
+        _.forEach(this._value, (val) => {
+            if (val instanceof FilterObject) {
+                val.remove(value);
+                if (val._value.length === 0) {
+                    _.pull(this._value, val);
+                }
+            }
+            else {
+                _.pull(this._value, value);
+            }
+        });
+    }
+
+    /**
+     * @function setType
+     * @summary Sets the conjugation type (or(|) or and(^))
+     * @return {string}
+     */
+    setType(type) {
+        if (type !== '^') type = '|';
+        this._type = type;
+        return this;
+    }
+
+    /**
+     * @function checkType
+     * @summary Compares the conjugation type (or(|) or and(^))
+     * @return {boolean}
+     */
+    checkType(type) {
+        return type === this._type;
+    }
+
+    /**
+     * @function append
+     * @summary Adds a value to the filter
+     * @return {string}
+     */
+    append(value) {
+        if (value instanceof FilterObject && value.checkType(this._type)) {
+            this._value = _.union(value._value);
+        }
+        else {
+            this._value.push(value);
+        }
+
+        return this;
+    }
+    /**
+     * @function toString
+     * @summary Converts the filter object into seperating its filters by its conjugation type
+     * @return {string}
+     */
+    toString() {
+        return _.join(this._value, this._type);
+    }
+}
+
+module.exports = FilterObject;
