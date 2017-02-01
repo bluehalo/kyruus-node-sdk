@@ -33,13 +33,22 @@ class FilterObject {
     }
 
     /**
+     * @function getType
+     * @summary Returns the number of filters in this object
+     * @return {number}
+     */
+    size() {
+        return this._value.length;
+    }
+
+    /**
      * @function remove
      * @summary Removes the value from the filter
      * @param {string} value - value to remove
      * @return {string}
      */
     remove(value) {
-        this.remove(value);
+        this.delete(value);
     }
 
     /**
@@ -49,12 +58,15 @@ class FilterObject {
      * @return {string}
      */
     delete(value) {
-        _.forEach(value, (val) => {
-            if(val instanceof FilterObject) {
+        _.forEach(this._value, (val) => {
+            if (val instanceof FilterObject) {
                 val.remove(value);
+                if (val._value.length === 0) {
+                    _.pull(this._value, val);
+                }
             }
             else {
-                _.pull(this.value )
+                _.pull(this._value, value);
             }
         });
     }
@@ -308,9 +320,10 @@ class k {
      * @return {k}
      */
     deleteFromFilter(field, value) {
-        if (this._filter instanceof FilterObject) {
-            if(this._filter[field]) {
-                this._filter[field].remove(value);
+        if(this._filter[field] instanceof FilterObject) {
+            this._filter[field].remove(value);
+            if (this._filter[field].size() === 0) {
+                delete this._filter[field];
             }
         }
         return this;
@@ -356,6 +369,19 @@ class k {
     }
 
     /**
+     * @function removeNpis
+     * @summary Adds npis to query
+     * @param {...string} npis - npis to add
+     * @return {k}
+     */
+    removeNpis(...npis) {
+        _.forEach(npis, (npi) => {
+            this.removeFromFilter('npi', npi);
+        });
+        return this;
+    }
+
+    /**
      * @function gender
      * @summary Adds gender to query
      * @param {string} gender - gender to add
@@ -366,14 +392,38 @@ class k {
     }
 
     /**
-     * @function gender
+     * @function removeGender
+     * @summary Removes a gender from the query if it exists
+     * @param {...string} npis - npis to add
+     * @return {k}
+     */
+    removeGender(gender) {
+        return this.removeFromFilter('gender', gender);
+    }
+
+    /**
+     * @function locationNames
      * @summary Adds location names to query
-     * @param {string} gender - gender to add
+     * @param {...string} locations - location names to add
      * @return {k}
      */
     locationNames(...locations) {
         _.forEach(locations, (location) => {
             this.filterOther('locations.name', location);
+        });
+        return this;
+
+    }
+
+    /**
+     * @function removeLocationNames
+     * @summary Removes location names from query
+     * @param {...string} locations - locations to remove
+     * @return {k}
+     */
+    removeLocationNames(...locations) {
+        _.forEach(locations, (location) => {
+            this.removeFromFilter('locations.name', location);
         });
         return this;
 
@@ -393,6 +443,19 @@ class k {
     }
 
     /**
+     * @function removeSpecialties
+     * @summary Removes specialties from query
+     * @param {...string} specialties - specialties to remove
+     * @return {k}
+     */
+    removeSpecialties(...specialties) {
+        _.forEach(specialties, (specialty) => {
+            this.removeFromFilter('specialties.specialty.untouched', specialty);
+        });
+        return this;
+    }
+
+    /**
      * @function subSpecialties
      * @summary Adds sub-specialties to query
      * @param {...string} specialties - sub-specialties to add
@@ -406,13 +469,36 @@ class k {
     }
 
     /**
-     * @function subSpecialties
-     * @summary Adds sub-specialties to query
-     * @param {...string} specialties - sub-specialties to add
+     * @function removeSubSpecialties
+     * @summary Removes sub-specialties from query
+     * @param {...string} specialties - sub-specialties to remove
      * @return {k}
      */
-    practiceFocus(...focuses) {
+    removeSubSpecialties(...specialties) {
+        _.forEach(specialties, (specialty) => {
+            this.removeFromFilter('specialties.subspecialty.untouched', specialty);
+        });
+        return this;
+    }
+
+    /**
+     * @function practiceFocus
+     * @summary Adds practice focus to query
+     * @param {string} focus - Practice focus to add
+     * @return {k}
+     */
+    practiceFocus(focus) {
         return this.filterOther('specialties.practice_focus.untouched', focus);
+    }
+
+    /**
+     * @function removePracticeFocus
+     * @summary Removes practice focus if it exists
+     * @param {string} focus - Practice focus to remove
+     * @return {k}
+     */
+    removePracticeFocus(focus) {
+        return this.removeFromFilter('specialties.practice_focus.untouched', focus);
     }
 
     /**
@@ -424,6 +510,19 @@ class k {
     cityLocations(...cities) {
         _.forEach(cities, (city) => {
             this.filterOther('locations.city', city);
+        });
+        return this;
+    }
+
+    /**
+     * @function removeCityLocations
+     * @summary Removes city locations from query
+     * @param {...string} cities - cities to remove
+     * @return {k}
+     */
+    removeCityLocations(...cities) {
+        _.forEach(cities, (city) => {
+            this.removeFromFilter('locations.city', city);
         });
         return this;
     }
@@ -442,13 +541,36 @@ class k {
     }
 
     /**
-     * @function filterAcceptingNewPatients
+     * @function removeLanguages
+     * @summary Removes languages from query
+     * @param {...string} cities - languages to remove
+     * @return {k}
+     */
+    removeLanguages(...languages) {
+        _.forEach(languages, (language) => {
+            this.removeFromFilter('languages.language', language);
+        });
+        return this;
+    }
+
+    /**
+     * @function acceptingNewPatients
      * @summary Adds accepting_new_patients filter to query
      * @param {boolean} accepts - filter on true/false if the provider is accepting new patients (default true)
      * @return {k}
      */
     acceptingNewPatients(accepts = true) {
         return this.filterOther('accepting_new_patients', accepts);
+    }
+
+    /**
+     * @function filterAcceptingNewPatients
+     * @summary Removes from accepting new patients if it exists
+     * @param {boolean} accepts - remove true/false accepting new patients if it's set to that value
+     * @return {k}
+     */
+    removeAcceptingNewPatients(accepts = true) {
+        return this.removeFromFilter('accepting_new_patients', accepts);
     }
 
     /**
