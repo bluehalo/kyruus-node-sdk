@@ -614,7 +614,9 @@ class k {
     toString() {
         let queryParams = []
         let addQueryParam = function (val, key) {
-            queryParams.push(`${key}=${val}`);
+            if(val && key) {
+                queryParams.push(`${key}=${val}`);
+            }
         }
         _.map(this._params, addQueryParam);
         let vectorKey = _.get(this,'_vector[field]', null);
@@ -622,10 +624,11 @@ class k {
         if(vectorKey && vectorValue) {
             addQueryParam(vectorValue, vectorKey);
         }
-        let locationKey = _.get(this,'_location[field]', null);
-        let locationValue = _.get(this,'_location[value]', null);
-        if(vectorKey && vectorValue) {
-            addQueryParam(vectorValue, vectorKey);
+        let location = _.get(this,'_location[location]', null);
+        let distance = _.get(this,'_location[distance]', null);
+        if(location) {
+            addQueryParam('location', location);
+            addQueryParam('distance', distance);
         }
         _.forIn(this._filter, (value, key) => {
             queryParams.push(`filter=${key}:${value}`);

@@ -275,4 +275,89 @@ describe('Kyruus Query Builder', () => {
             vectorTest(...test);
         }
     });
+
+    describe('Test Vectors', () => {
+        it(`should exist`, () => {
+            should(queryBuilder.hasOwnProperty('_vector'));
+            should(queryBuilder._vector.hasOwnProperty('field'));
+            should(queryBuilder._vector.hasOwnProperty('value'));
+        });
+
+        const vectorTest = function(field, func) {
+            it(`should not have ${field}`, () => {
+                should(queryBuilder._vector.field !== field);
+            });
+            it(`should have function ${func}`, () =>  {
+                should(queryBuilder.hasOwnProperty(func));
+            });
+            it(`should add vector ${field}`, () => {
+                queryBuilder[func]('a');
+                should(queryBuilder._vector.field === field);
+            });
+        };
+        it(`should add vector to query`, () => {
+            queryBuilder.vector('a','b');
+            should(`${queryBuilder}`.indexOf('a=b') > 0);
+        });
+        it(`should override vector in query`, () => {
+            queryBuilder.vector('a','b');
+            queryBuilder.vector('c','d');
+            should(`${queryBuilder}`.indexOf('a=b') < 0);
+            should(`${queryBuilder}`.indexOf('c=d') > 0);
+        });
+        for (let test of vectors) {
+            vectorTest(...test);
+        }
+    });
+
+    describe('Test Location', () => {
+        it(`should exist`, () => {
+            should(queryBuilder.hasOwnProperty('_vector'));
+            should(queryBuilder._vector.hasOwnProperty('field'));
+            should(queryBuilder._vector.hasOwnProperty('value'));
+        });
+
+        const vectorTest = function(field, func) {
+            it(`should not have ${field}`, () => {
+                should(queryBuilder._vector.field !== field);
+            });
+            it(`should have function ${func}`, () =>  {
+                should(queryBuilder.hasOwnProperty(func));
+            });
+            it(`should add vector ${field}`, () => {
+                queryBuilder[func]('a');
+                should(queryBuilder._vector.field === field);
+            });
+        };
+        it(`should add vector to query`, () => {
+            queryBuilder.vector('a','b');
+            should(`${queryBuilder}`.indexOf('a=b') > 0);
+        });
+        it(`should override vector in query`, () => {
+            queryBuilder.vector('a','b');
+            queryBuilder.vector('c','d');
+            should(`${queryBuilder}`.indexOf('a=b') < 0);
+            should(`${queryBuilder}`.indexOf('c=d') > 0);
+        });
+        for (let test of vectors) {
+            vectorTest(...test);
+        }
+    });
+
+    describe('Test Location', () => {
+        it(`should not have location`, () => {
+            should(!queryBuilder._location.location);
+            should(!queryBuilder._location.distance);
+        });
+        it(`should have location`, () => {
+            queryBuilder.location('21144','1');
+            should(queryBuilder._location.location === '21144');
+            should(queryBuilder._location.distance === '1');
+        });
+        it(`should add locations to query`, () => {
+            queryBuilder.location('21144','1');
+            should(`${queryBuilder}`.indexOf('&location=21144'));
+            should(`${queryBuilder}`.indexOf('&distance=1'));
+        });
+    });
 });
