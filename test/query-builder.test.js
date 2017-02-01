@@ -21,51 +21,71 @@ describe('Kyruus Query Builder', () => {
             should.exist(queryBuilder._filter);
         });
     });
-    let filterTestString = 'YqmNuEMKZwb4Ih30Q8h0bAIJ622csxPv0gptSZxnzHVSYkTg5rJxZnx0oGfgpgnFvkWWZcF5FgnhG3rSbUX75fojB6wky7WwpcsEfIlh806YTugkn3xrnTTpjqzmIO'
-    let filterTests = [['npis', 'npi']];
+    let filterTestString = 'YqmNuEMKZwb4Ih30Q8h0bAIJ622csxPv0gptSZxnzHVSYkTg5rJxZnx0oGfgpgnFvkWWZcF5FgnhG3rSbUX75fojB6wky7WwpcsEfIlh806YTugkn3xrnTTpjqzmIO'.split('');
+    const filterTests = [['npi', 'npis'],
+                        ['locations.name', 'locationNames'],
+                        ['specialties.specialty.untouched', 'specialties'],
+                        ['specialties.subspecialty.untouched', 'subSpecialties'],
+                        ['locations.city', 'cityLocations'],
+                        ['languages.language', 'languages']];
 
-    describe('Test NPIs', () => {
-        it('should not have npi field', () => {
-            should.not.exist(queryBuilder._filter['npi']);
-        });
-        it('should have npi field', () => {
-            queryBuilder.npis('123');
-            should.exist(queryBuilder._filter['npi']);
-        });
-        it('npi filter should be FilterObject', () => {
-            queryBuilder.npis('123');
-            should(queryBuilder._filter['npi'] instanceof FilterObject);
-        });
-        it('npi filter should import single value', () => {
-            queryBuilder.npis('123');
-            should(queryBuilder._filter['npi'].size() === 1);
-        });
-        it('npi filter should import two values', () => {
-            queryBuilder.npis('123', '456');
-            should(queryBuilder._filter['npi'].size() === 2);
-        });
-        it('npi filter should remove values', () => {
-            queryBuilder.npis('123', '456');
-            should(queryBuilder._filter['npi'].size() > 1);
-            queryBuilder.removeNpis('123');
-            should(queryBuilder._filter['npi'].size() === 1);
-        });
-        it('npi filter should not exist', () => {
-            queryBuilder.npis('123', '456');
-            should.exist(queryBuilder._filter['npi']);
-            queryBuilder.removeNpis('123', '456');
-            should.not.exist(queryBuilder._filter['npi']);
-        });
-        it('query should not contain npi filter', () => {
-            should(`${queryBuilder}`.indexOf('filter=npi:') < 0);
-        });
-        it('query should contain npi filter', () => {
-            queryBuilder.npis('123');
-            should(`${queryBuilder}`.indexOf('filter=npi:') > 0);
-        });
-        it('should format npi filter pipes', () => {
-            queryBuilder.npis('123', '456');
-            should(`${queryBuilder}`.indexOf('filter=npi:123|456') > 0);
-        });
+    describe('Test Multi Filters', () => {
+        const filterTest = (field, func, val1, val2) => {
+            let removeFunc = 'remove' + func.charAt(0).toUpperCase() + func.slice(1);
+            describe(`Test ${func} filter`, () => {
+                it(`should have function ${func}`, () => {
+                    should.not.exist(queryBuilder._filter[field]);
+                });
+                it(`should have remove function ${removeFunc}`, () => {
+                    should.not.exist(queryBuilder._filter[field]);
+                });
+                it(`should not have ${field} field`, () => {
+                    should.not.exist(queryBuilder._filter[field]);
+                });
+                it(`should have ${field} field`, () => {
+                    queryBuilder[func](val1);
+                    should.exist(queryBuilder._filter[field]);
+                });
+                it(`${field} filter should be FilterObject`, () => {
+                    queryBuilder[func](val1);
+                    should(queryBuilder._filter[field] instanceof FilterObject);
+                });
+                it(`${field} filter should import single value`, () => {
+                    queryBuilder[func](val1);
+                    should(queryBuilder._filter[field].size() === 1);
+                });
+                it(`${field} filter should import two values`, () => {
+                    queryBuilder[func](val1, val2);
+                    should(queryBuilder._filter[field].size() === 2);
+                });
+                it(`${field} filter should remove values`, () => {
+                    queryBuilder[func](val1, val2);
+                    should(queryBuilder._filter[field].size() > 1);
+                    queryBuilder[removeFunc](val1);
+                    should(queryBuilder._filter[field].size() === 1);
+                });
+                it(`${field} filter should not exist`, () => {
+                    queryBuilder[func](val1, val2);
+                    should.exist(queryBuilder._filter[field]);
+                    queryBuilder[removeFunc](val1, val2);
+                    should.not.exist(queryBuilder._filter[field]);
+                });
+                it(`query should not contain ${field} filter`, () => {
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:`) < 0);
+                });
+                it(`query should contain ${field} filter`, () => {
+                    queryBuilder[func](val1);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:`) > 0);
+                });
+                it(`should format npi filter pipes`, () => {
+                    queryBuilder[func](val1, val2);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:${val1}|${val2}`) > 0);
+                });
+            });
+        };
+        for (let test of filterTests) {
+            filterTest(...test, filterTestString.pop(), filterTestString.pop());
+        }
+
     });
 });
