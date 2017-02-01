@@ -31,23 +31,23 @@ const FilterObject = require('./filter-object.js');
 class k {
 
     // Constants
-    get NAME() {
+    static get NAME() {
         return 'name';
     }
 
-    get SPECIALTYSYNONYM() {
+    static get SPECIALTYSYNONYM() {
         return 'specialty.synonym';
     }
 
-    get CLINICALEXPERIENCE() {
+    static get CLINICALEXPERIENCE() {
         return 'clinical.experience';
     }
 
-    get PRACTICEGROUP() {
+    static get PRACTICEGROUP() {
         return 'practice.group';
     }
 
-    get UNIFIED() {
+    static get UNIFIED() {
         return 'unified';
     }
 
@@ -76,10 +76,21 @@ class k {
      * Location functions
      */
 
+     /**
+      * @function location
+      * @summary Adds the special location filter to the query.
+      * @param {string} location - Central location to sort by
+      * @param {string} distance - Radius from the location in miles to match
+      * @return {k}
+      */
     location(location, distance) {
-        return this._location = {location: location, distance: distance};
+        this._location = {location: location, distance: distance};
+        return this;
     }
-
+    removeLocation(locatio, distance) {
+        this._location = {location: null, distance: null};
+        return this;
+    }
     /*
      * Vector functions
      */
@@ -520,13 +531,31 @@ class k {
     }
 
     /**
-     * @function shuffle
-     * @summary Adds a seed to shuffle return results
-     * @param {string} seed - String to seed the shuffle with
+     * @function removeShuffle
+     * @summary Removes shuffle seed
+     * @return {k}
+     */
+   removeShuffle() {
+       return this.remove('shuffle_seed');
+   }
+
+    /**
+     * @function sort
+     * @summary Adds a field to sort results by
+     * @param {string} seed - Field to sort by
      * @return {k}
      */
     sort(field) {
         return this.param('sort', field);
+    }
+
+    /**
+     * @function removeSort
+     * @summary Removes sorting on search results
+     * @return {k}
+     */
+    removeSort() {
+        return this.remove('sort');
     }
 
     /**
@@ -540,6 +569,25 @@ class k {
     }
 
     /**
+     * @function removePageSize
+     * @summary Removes page size parameter
+     * @param {string} size - Number of results per page
+     * @return {k}
+     */
+    removePageSize(size) {
+        return this.param('per_page', size);
+    }
+
+    /**
+     * @function removePageSize
+     * @summary Removes page size from query
+     * @return {k}
+     */
+    removePageSize() {
+        return this.remove('per_page');
+    }
+
+    /**
      * @function pageNumber
      * @summary Adds the page number to return results. The results are going to be [pageSize*pageNumber...pageSize*pageNumber+pageNumber-1]
      * @param {string} number - Page number
@@ -547,6 +595,15 @@ class k {
      */
     pageNumber(number) {
         return this.param('page', number);
+    }
+
+    /**
+     * @function removePageNumber
+     * @summary Removes page number from query
+     * @return {k}
+     */
+    removePageNumber(number) {
+        return this.remove('page');
     }
 
     /**
@@ -562,6 +619,11 @@ class k {
         _.map(this._params, addQueryParam);
         let vectorKey = _.get(this,'_vector[field]', null);
         let vectorValue = _.get(this,'_vector[value]', null);
+        if(vectorKey && vectorValue) {
+            addQueryParam(vectorValue, vectorKey);
+        }
+        let locationKey = _.get(this,'_location[field]', null);
+        let locationValue = _.get(this,'_location[value]', null);
         if(vectorKey && vectorValue) {
             addQueryParam(vectorValue, vectorKey);
         }
