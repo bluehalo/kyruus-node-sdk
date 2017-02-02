@@ -2,6 +2,12 @@
 const _ = require('lodash');
 
 class FilterObject {
+    /**
+     * Object for keeping track of kyruus filters
+     * @param {string} value - value of filter
+     * @param {string} type - the conjuction for the filter (| or ^)
+     * @constructor
+    */
     constructor(value, type = '') {
         if (! _.isArray(this._value)) value = [value];
         this._value = value;
@@ -62,8 +68,7 @@ class FilterObject {
      * @return {string}
      */
     setType(type) {
-        if (type !== '^') type = '|';
-        this._type = type;
+        this._type = type !== '^' ? '|' : '^';
         return this;
     }
 
