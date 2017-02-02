@@ -53,6 +53,7 @@ class FilterObject {
                 _.pull(this._value, value);
             }
         });
+        return this;
     }
 
     /**
