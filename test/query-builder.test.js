@@ -326,4 +326,21 @@ describe('Kyruus Query Builder', () => {
             should(`${queryBuilder}`.indexOf('&distance=1'));
         });
     });
+
+    describe('Test Multi', () => {
+        it(`should not have location`, () => {
+            should(!queryBuilder._location.location);
+            should(!queryBuilder._location.distance);
+        });
+        it(`should have location`, () => {
+            queryBuilder.location('21144','1');
+            should(queryBuilder._location.location === '21144');
+            should(queryBuilder._location.distance === '1');
+        });
+        it(`should add locations to query`, () => {
+            queryBuilder.location('21144','1');
+            should(`${queryBuilder}`.indexOf('&location=21144'));
+            should(`${queryBuilder}`.indexOf('&distance=1'));
+        });
+    });
 });
