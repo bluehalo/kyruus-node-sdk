@@ -49,52 +49,53 @@ describe('Kyruus Query Builder', () => {
             let removeFunc = 'remove' + func.charAt(0).toUpperCase() + func.slice(1);
             describe(`Test ${func} filter`, () => {
                 it(`should have function ${func}`, () => {
-                    should(queryBuilder.hasOwnProperty(func));
+                    should(queryBuilder).have.property(func);
                 });
                 it(`should have remove function ${removeFunc}`, () => {
-                    should(queryBuilder.hasOwnProperty(removeFunc));
+                    should(queryBuilder).have.property(removeFunc);
                 });
                 it(`should not have ${field} field`, () => {
-                    should(!queryBuilder._filter.hasOwnProperty(field));
+
+                    should(queryBuilder._filter).not.have.key(field);
                 });
                 it(`should have ${field} field`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).have.key(field);
                 });
                 it(`${field} filter should be FilterObject`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter[field] instanceof FilterObject);
+                    should(queryBuilder._filter[field]).be.an.instanceOf(FilterObject);
                 });
                 it(`${field} filter should import single value`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter[field].size() === 1);
+                    should(queryBuilder._filter[field].size()).be.equal(1);
                 });
                 it(`${field} filter should import two values`, () => {
                     queryBuilder[func](val1, val2);
-                    should(queryBuilder._filter[field].size() === 2);
+                    should(queryBuilder._filter[field].size()).be.equal(2);
                 });
                 it(`${field} filter should remove values`, () => {
                     queryBuilder[func](val1, val2);
-                    should(queryBuilder._filter[field].size() > 1);
+                    should(queryBuilder._filter[field].size()).be.greaterThan(1);
                     queryBuilder[removeFunc](val1);
-                    should(queryBuilder._filter[field].size() === 1);
+                    should(queryBuilder._filter[field].size()).be.equal(1);
                 });
                 it(`${field} filter should not exist`, () => {
                     queryBuilder[func](val1, val2);
-                    should(queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).have.key(field);
                     queryBuilder[removeFunc](val1, val2);
-                    should(!queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).not.have.key(field);
                 });
                 it(`query should not contain ${field} filter`, () => {
-                    should(`${queryBuilder}`.indexOf(`filter=${field}:`) < 0);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:`)).be.lessThan(0);
                 });
                 it(`query should contain ${field} filter`, () => {
                     queryBuilder[func](val1);
-                    should(`${queryBuilder}`.indexOf(`filter=${field}:`) > 0);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:`)).be.greaterThan(0);
                 });
                 it(`should format npi filter pipes`, () => {
                     queryBuilder[func](val1, val2);
-                    should(`${queryBuilder}`.indexOf(`filter=${field}:${val1}|${val2}`) > 0);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:${val1}|${val2}`)).be.greaterThan(0);
                 });
             });
         };
@@ -109,38 +110,38 @@ describe('Kyruus Query Builder', () => {
             let removeFunc = 'remove' + func.charAt(0).toUpperCase() + func.slice(1);
             describe(`Test ${func} filter`, () => {
                 it(`should have function ${func}`, () => {
-                    should(queryBuilder.hasOwnProperty(func));
+                    should(queryBuilder).have.property(func);
                 });
                 it(`should have remove function ${removeFunc}`, () => {
-                    should(queryBuilder.hasOwnProperty(removeFunc));
+                    should(queryBuilder).have.property(removeFunc);
                 });
                 it(`should not have ${field} field`, () => {
-                    should(!queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).not.have.key(field);
                 });
                 it(`should have ${field} field`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).have.key(field);
                 });
                 it(`${field} filter should be FilterObject`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter[field] instanceof FilterObject);
+                    should(queryBuilder._filter[field]).be.instanceof(FilterObject);
                 });
                 it(`${field} filter should import single value`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter[field].size() === 1);
+                    should(queryBuilder._filter[field].size()).be.equal(1);
                 });
                 it(`${field} filter should not exist`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).have.key(field);
                     queryBuilder[removeFunc](val1);
-                    should(!queryBuilder._filter.hasOwnProperty(field));
+                    should(queryBuilder._filter).not.have.key(field);
                 });
                 it(`query should not contain ${field} filter`, () => {
-                    should(`${queryBuilder}`.indexOf(`filter=${field}:`) < 0);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:`)).be.lessThan(0);
                 });
                 it(`query should contain ${field} filter`, () => {
                     queryBuilder[func](val1);
-                    should(`${queryBuilder}`.indexOf(`filter=${field}:`) > 0);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:`)).be.greaterThan(0);
                 });
             });
         };
@@ -154,36 +155,36 @@ describe('Kyruus Query Builder', () => {
             let removeFunc = 'remove' + func.charAt(0).toUpperCase() + func.slice(1);
             describe(`Test ${func} filter`, () => {
                 it(`should have function ${func}`, () => {
-                    should(queryBuilder.hasOwnProperty(func));
+                    should(queryBuilder).have.property(func);
                 });
                 it(`should have remove function ${removeFunc}`, () => {
-                    should(queryBuilder.hasOwnProperty(removeFunc));
+                    should(queryBuilder).have.property(removeFunc);
                 });
                 it(`should not have ${field} field`, () => {
-                    should(!queryBuilder._params.hasOwnProperty(field));
+                    should(queryBuilder._params).not.have.key(field);
                 });
                 it(`should have ${field} field`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._params.hasOwnProperty(field));
+                    should(queryBuilder._params).have.key(field);
                 });
                 it(`${field} parameter should be overwritten`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._params[field] === val1);
+                    should(queryBuilder._params[field]).be.equal(val1);
                     queryBuilder[func](val2);
-                    should(queryBuilder._params[field] === val2);
+                    should(queryBuilder._params[field]).be.equal(val2);
                 });
                 it(`${field} should not exist after remove`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._params.hasOwnProperty(field));
+                    should(queryBuilder._params).have.key(field);
                     queryBuilder[removeFunc]();
-                    should(!queryBuilder._params.hasOwnProperty(field));
+                    should(queryBuilder._params).not.have.key(field);
                 });
                 it(`query should not contain ${field} param`, () => {
-                    should(`${queryBuilder}`.indexOf(`${field}=${val1}`) < 0);
+                    should(`${queryBuilder}`.indexOf(`${field}=${val1}`)).be.lessThan(0);
                 });
                 it(`query should contain ${field} param`, () => {
                     queryBuilder[func](val1);
-                    should(`${queryBuilder}`.indexOf(`${field}=${val1}`) > 0);
+                    should(`${queryBuilder}`.indexOf(`${field}=${val1}`)).be.greaterThan(0);
                 });
             });
         };
@@ -193,117 +194,62 @@ describe('Kyruus Query Builder', () => {
     });
     describe('Test Filter Construction', () => {
         it(`should be empty`, () => {
-            should(!`${queryBuilder}`);
+            should(`${queryBuilder}`).be.empty;
         });
         it(`should not be empty`, () => {
             queryBuilder.filterOther('a','b');
-            should(`${queryBuilder}`);
+            should(`${queryBuilder}`).not.be.empty;
         });
         it(`should start with ?`, () => {
             queryBuilder.filterOther('a','b');
-            should(`${queryBuilder}`.charAt(0) === '?');
+            should(`${queryBuilder}`.charAt(0)).be.equal('?');
         });
-        it(`should have one param`, () => {
+        it(`should have two param`, () => {
             queryBuilder.filterOther('a','b');
             queryBuilder.param('c','d');
-            should((`${queryBuilder}`.match(/=/g)||[]).length === 1);
+            should(`${queryBuilder}`.match(/=/g)||[]).have.length(2);
         });
         it(`should have three params`, () => {
             queryBuilder.filterOther('a','b');
             queryBuilder.param('c','d');
             queryBuilder.param('e','f');
-            should((`${queryBuilder}`.match(/=/g)||[]).length === 3);
-            should((`${queryBuilder}`.match(/&/g)||[]).length === 2);
+            should(`${queryBuilder}`.match(/=/g)||[]).have.length(3);
         });
         it(`should have no params after removing`, () => {
             queryBuilder.param('c','d');
             queryBuilder.remove('c');
-            should(!`${queryBuilder}`);
-        });
-    });
-    describe('Test Remove', () => {
-        it(`should be empty`, () => {
-            should(!`${queryBuilder}`);
-        });
-        it(`should not be empty`, () => {
-            queryBuilder.filterOther('a','b');
-            should(`${queryBuilder}`);
-        });
-        it(`should start with ?`, () => {
-            queryBuilder.filterOther('a','b');
-            should(`${queryBuilder}`.charAt(0) === '?');
-        });
-        it(`should have one param`, () => {
-            queryBuilder.filterOther('a','b');
-            queryBuilder.param('c','d');
-            should((`${queryBuilder}`.match(/=/g)||[]).length === 1);
-        });
-        it(`should have three params`, () => {
-            queryBuilder.filterOther('a','b');
-            queryBuilder.param('c','d');
-            queryBuilder.param('e','f');
-            should((`${queryBuilder}`.match(/=/g)||[]).length === 3);
-            should((`${queryBuilder}`.match(/&/g)||[]).length === 2);
-        });
-        it(`should have no params after removing`, () => {
-            queryBuilder.param('c','d');
-            queryBuilder.remove('c');
-            should(!`${queryBuilder}`);
+            should(`${queryBuilder}`).be.empty;
         });
     });
 
     describe('Test Vectors', () => {
         it(`should exist`, () => {
-            should(queryBuilder.hasOwnProperty('_vector'));
-            should(queryBuilder._vector.hasOwnProperty('field'));
-            should(queryBuilder._vector.hasOwnProperty('value'));
+            should(queryBuilder).have.property('_vector');
+            should(queryBuilder._vector).have.property('field');
+            should(queryBuilder._vector).have.property('value');
         });
 
         const vectorTest = function(field, func) {
             it(`should not have ${field}`, () => {
-                should(queryBuilder._vector.field !== field);
+                should(queryBuilder._vector.field).not.be.equal(field);
             });
             it(`should have function ${func}`, () =>  {
-                should(queryBuilder.hasOwnProperty(func));
+                should(queryBuilder).have.property(func);
             });
             it(`should add vector ${field}`, () => {
                 queryBuilder[func]('a');
-                should(queryBuilder._vector.field === field);
-            });
-        };
-        for (let test of vectors) {
-            vectorTest(...test);
-        }
-    });
-
-    describe('Test Vectors', () => {
-        it(`should exist`, () => {
-            should(queryBuilder.hasOwnProperty('_vector'));
-            should(queryBuilder._vector.hasOwnProperty('field'));
-            should(queryBuilder._vector.hasOwnProperty('value'));
-        });
-
-        const vectorTest = function(field, func) {
-            it(`should not have ${field}`, () => {
-                should(queryBuilder._vector.field !== field);
-            });
-            it(`should have function ${func}`, () =>  {
-                should(queryBuilder.hasOwnProperty(func));
-            });
-            it(`should add vector ${field}`, () => {
-                queryBuilder[func]('a');
-                should(queryBuilder._vector.field === field);
+                should(queryBuilder._vector.field).be.equal(field);
             });
         };
         it(`should add vector to query`, () => {
             queryBuilder.vector('a','b');
-            should(`${queryBuilder}`.indexOf('a=b') > 0);
+            should(`${queryBuilder}`.indexOf('a=b')).be.greaterThan(0);
         });
         it(`should override vector in query`, () => {
             queryBuilder.vector('a','b');
             queryBuilder.vector('c','d');
-            should(`${queryBuilder}`.indexOf('a=b') < 0);
-            should(`${queryBuilder}`.indexOf('c=d') > 0);
+            should(`${queryBuilder}`.indexOf('a=b')).be.lessThan(0);
+            should(`${queryBuilder}`.indexOf('c=d')).be.greaterThan(0);
         });
         for (let test of vectors) {
             vectorTest(...test);
@@ -312,35 +258,27 @@ describe('Kyruus Query Builder', () => {
 
     describe('Test Location', () => {
         it(`should not have location`, () => {
-            should(!queryBuilder._location.location);
-            should(!queryBuilder._location.distance);
+            should(queryBuilder._location.location).not.exist;
+            should(queryBuilder._location.distance).not.exist;
         });
         it(`should have location`, () => {
             queryBuilder.location('21144','1');
-            should(queryBuilder._location.location === '21144');
-            should(queryBuilder._location.distance === '1');
+            should(queryBuilder._location.location).be.equal('21144');
+            should(queryBuilder._location.distance).be.equal('1');
         });
         it(`should add locations to query`, () => {
             queryBuilder.location('21144','1');
-            should(`${queryBuilder}`.indexOf('&location=21144'));
-            should(`${queryBuilder}`.indexOf('&distance=1'));
+            should(`${queryBuilder}`.indexOf('location=21144')).be.greaterThan(0);
+            should(`${queryBuilder}`.indexOf('distance=1')).be.greaterThan(0);
         });
     });
 
-    describe('Test Multi', () => {
-        it(`should not have location`, () => {
-            should(!queryBuilder._location.location);
-            should(!queryBuilder._location.distance);
-        });
-        it(`should have location`, () => {
-            queryBuilder.location('21144','1');
-            should(queryBuilder._location.location === '21144');
-            should(queryBuilder._location.distance === '1');
-        });
-        it(`should add locations to query`, () => {
-            queryBuilder.location('21144','1');
-            should(`${queryBuilder}`.indexOf('&location=21144'));
-            should(`${queryBuilder}`.indexOf('&distance=1'));
+    describe('Test Multiple Conjuctions', () => {
+        it(`should correctly set multiple parameters`, () => {
+            queryBuilder.filterOther('a','b').vector('c','d').param('e','g');
+            should(`${queryBuilder}`.indexOf('filter=a:b')).be.greaterThan(0);
+            should(`${queryBuilder}`.indexOf('c=d')).be.greaterThan(0);
+            should(`${queryBuilder}`.indexOf('e=g')).be.greaterThan(0);
         });
     });
 });

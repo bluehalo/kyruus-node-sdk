@@ -104,8 +104,8 @@ class k {
      * @return {k}
      */
     vector(field, value) {
-        this._vector['field'] = field;
-        this._vector['value'] = value;
+        this._vector.field = field;
+        this._vector.value = value;
         return this;
     }
 
@@ -116,7 +116,7 @@ class k {
      * @return {k}
      */
     name(name) {
-        return this.vector(this.NAME, name);
+        return this.vector(k.NAME, name);
     }
 
     /**
@@ -127,7 +127,7 @@ class k {
      */
     // Figure out of this is correct
     specialtySynonym(synonym) {
-        return this.vector(this.SPECIALTYSYNONYM, synonym);
+        return this.vector(k.SPECIALTYSYNONYM, synonym);
     }
 
     /**
@@ -138,7 +138,7 @@ class k {
      */
     // Figure out of this is correct
     clinicalExperience(experience) {
-        return this.vector(this.CLINICALEXPERIENCE, experience);
+        return this.vector(k.CLINICALEXPERIENCE, experience);
     }
 
     /**
@@ -149,7 +149,7 @@ class k {
      */
     // Figure out of this is correct
     practiceGroup(group) {
-        return this.vector(this.PRACTICEGROUP, group);
+        return this.vector(k.PRACTICEGROUP, group);
     }
 
     /**
@@ -160,7 +160,7 @@ class k {
      */
     // Figure out of this is correct
     unified(unified) {
-        return this.vector(this.UNIFIED, unified);
+        return this.vector(k.UNIFIED, unified);
     }
 
     /*
@@ -575,7 +575,7 @@ class k {
      * @return {k}
      */
     removePageSize(size) {
-        return this.param('per_page', size);
+        return this.remove('per_page', size);
     }
 
     /**
@@ -618,17 +618,19 @@ class k {
                 queryParams.push(`${key}=${val}`);
             }
         }
-        _.map(this._params, addQueryParam);
+        _.forIn(this._params, (val, key) => {
+            addQueryParam(val, key);
+        });
         let vectorKey = _.get(this,'_vector[field]', null);
         let vectorValue = _.get(this,'_vector[value]', null);
         if(vectorKey && vectorValue) {
             addQueryParam(vectorValue, vectorKey);
         }
-        let location = _.get(this,'_location[location]', null);
-        let distance = _.get(this,'_location[distance]', null);
+        let location = _.get(this,'_location.location', null);
+        let distance = _.get(this,'_location.distance', null);
         if(location) {
-            addQueryParam('location', location);
-            addQueryParam('distance', distance);
+            addQueryParam(location, 'location');
+            addQueryParam(distance, 'distance');
         }
         _.forIn(this._filter, (value, key) => {
             queryParams.push(`filter=${key}:${value}`);
