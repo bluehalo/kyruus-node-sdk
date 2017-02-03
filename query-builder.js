@@ -650,7 +650,7 @@ class k {
      */
     search() {
         if(this._api) {
-            return this._api.search(this.toString);
+            return this._api.search(this.toString());
         }
         return this;
     }
