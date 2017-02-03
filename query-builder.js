@@ -51,7 +51,7 @@ class k {
         return 'unified';
     }
 
-    constructor() {
+    constructor(api = null) {
         // The filter structure will be a query tree
         //              and
         //         /                  \
@@ -66,6 +66,9 @@ class k {
         this._params = [];
 
         this._currentFilter = '';
+
+        //function to run search queries on
+        this._api = api;
     }
 
     get filter() {
@@ -638,6 +641,18 @@ class k {
 
         return _.size(queryParams) > 0 ? '?'+_.join(queryParams, '&') : '';
 
+    }
+
+    /**
+     * @function search
+     * @summary Runs a kyruus search
+     * @return {Promise.<KyruusProviderSearch>|k}
+     */
+    search() {
+        if(this._api) {
+            return this._api.search(this.toString);
+        }
+        return this;
     }
 }
 module.exports = k;

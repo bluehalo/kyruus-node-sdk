@@ -4,6 +4,8 @@ const https = require('https'),
     q = require('q'),
     _ = require('lodash');
 
+const k = require('./query-builder.js');
+
 // Type Definitions
 // TODO find meaning of TBD Objects
 /**
@@ -214,6 +216,8 @@ class Kyruus {
         return `/pm/${this.version}/${this.source}/`;
     }
 
+
+
     /**
      * @function getProviderByNpi
      * @summary return a kyruus doctor object searched by npi
@@ -294,11 +298,20 @@ class Kyruus {
     search(searchString = '', path = 'providers') {
         let options = {
             hostname: this.endpoint,
-            path: this.__rootQueryPath() + path + (searchString.length ? '?' + searchString : '')
+            path: this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : searchString + '?') : '')
         };
 
         return this._refreshToken().then(() => this._https(this._generateDefaultOptions(options)));
     }
+
+    /**
+     * @function query
+     * @summary returns a new query builder to start using
+     * @return {k}
+     */
+     query() {
+         return new k(this);
+     }
 
     /**
      * @function _refreshToken
@@ -328,7 +341,7 @@ class Kyruus {
                 "content-type": "multipart/form-data; boundary=" + separator,
                 "cache-control": "no-cache"
             }};
-        
+
         separator = '--' + separator;
 
         // This is the body of the form request Kyruus uses to login
@@ -420,6 +433,12 @@ class Kyruus {
             req.end();
         });
     }
+
+    /**
+     *
+     *
+     */
+
 }
 
 module.exports =  Kyruus;
