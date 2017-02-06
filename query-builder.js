@@ -578,10 +578,9 @@ class k {
     /**
      * @function removeFacets
      * @summary Removes facets from query
-     * @param {...string} facets - facets to remove
      * @return {k}
      */
-    removeFacets(...facets) {
+    removeFacets() {
         this.remove('facet');
         return this;
     }
@@ -647,7 +646,14 @@ class k {
             }
         }
         _.forIn(this._params, (val, key) => {
-            addQueryParam(val, key);
+            if (_.isArray(val)) {
+                _.each(val, (v) => {
+                    addQueryParam(v, key);
+                });
+            }
+            else {
+                addQueryParam(val, key);
+            }
         });
         let vectorKey = _.get(this,'_vector[field]', null);
         let vectorValue = _.get(this,'_vector[value]', null);
