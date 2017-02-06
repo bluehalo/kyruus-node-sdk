@@ -156,6 +156,17 @@ class k {
     }
 
     /**
+     * @function isEncoded
+     * @summary Checks if input string is already encoded.
+     * @param {string} uri
+     * @return {k}
+     */
+    // Figure out of this is correct
+    isEncoded(uri = '') {
+        return uri !== decodeURIComponent(uri);
+    }
+
+    /**
      * @function unified
      * @summary Changes the vector to a unified vector and assigns the given value to the vector
      * @param {string} unified - value for the unified
@@ -163,6 +174,9 @@ class k {
      */
     // Figure out of this is correct
     unified(unified) {
+        if (!this.isEncoded(unified)) {
+            unified = encodeURIComponent(unified);
+        }
         return this.vector(k.UNIFIED, unified);
     }
 
@@ -178,6 +192,10 @@ class k {
      * @return {k}
      */
     filterOther(field, value, conjunction = 'or') {
+        if (!this.isEncoded(value)) {
+            value = encodeURIComponent(value);
+        }
+
         if (this._filter[field]) {
             if (this._filter[field].checkType(conjunction)) {
                 this._filter[field].append(value);
