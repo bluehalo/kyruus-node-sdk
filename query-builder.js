@@ -562,6 +562,26 @@ class k {
     }
 
     /**
+     * @function facet
+     * @summary Adds a field to facet results by
+     * @param {string} seed - Field to facet by
+     * @return {k}
+     */
+    facet(facets) {
+        return this.param('facet', facets);
+    }
+
+    /**
+     * @function removeFacet
+     * @summary Removes facets on search results
+     * @return {k}
+     */
+    removeFacet() {
+        return this.remove('facet');
+    }
+
+
+    /**
      * @function pageSize
      * @summary Sets the page size for return results
      * @param {string} size - Number of results per page

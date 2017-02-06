@@ -36,7 +36,8 @@ describe('Kyruus Query Builder', () => {
     const parameterTests = [['shuffle_seed', 'shuffle'],
                             ['sort','sort'],
                             ['per_page', 'pageSize'],
-                            ['page', 'pageNumber']];
+                            ['page', 'pageNumber'],
+                            ['facet', 'facet']];
 
     const vectors = [[k.NAME,'name'],
                     [k.SPECIALTYSYNONYM,'specialtySynonym'],
