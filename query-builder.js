@@ -561,25 +561,32 @@ class k {
         return this.remove('sort');
     }
 
+
     /**
-     * @function facet
-     * @summary Adds a field to facet results by
-     * @param {string} seed - Field to facet by
+     * @function facets
+     * @summary Adds facets to query
+     * @param {...string} facets - facets to add
      * @return {k}
      */
-    facet(facets) {
-        return this.param('facet', facets);
+    facets(...facets) {
+        _.forEach(facets, (facet) => {
+            this.filterOther('facet', facet);
+        });
+        return this;
     }
 
     /**
-     * @function removeFacet
-     * @summary Removes facets on search results
+     * @function removeFacets
+     * @summary Removes facets from query
+     * @param {...string} facets - facets to remove
      * @return {k}
      */
-    removeFacet() {
-        return this.remove('facet');
+    removeFacets(...facets) {
+        _.forEach(facets, (facet) => {
+            this.removeFromFilter('facet', facet);
+        });
+        return this;
     }
-
 
     /**
      * @function pageSize
