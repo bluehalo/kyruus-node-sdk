@@ -37,7 +37,7 @@ describe('Kyruus Query Builder', () => {
                             ['sort','sort'],
                             ['per_page', 'pageSize'],
                             ['page', 'pageNumber'],
-                            ['facets', 'facets']];
+                            ['facet', 'facets']];
 
     const vectors = [[k.NAME,'name'],
                     [k.SPECIALTYSYNONYM,'specialtySynonym'],

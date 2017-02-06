@@ -570,7 +570,7 @@ class k {
      */
     facets(...facets) {
         _.forEach(facets, (facet) => {
-            this.filterOther('facet', facet);
+            this.param('facet', facet);
         });
         return this;
     }
@@ -582,9 +582,7 @@ class k {
      * @return {k}
      */
     removeFacets(...facets) {
-        _.forEach(facets, (facet) => {
-            this.removeFromFilter('facet', facet);
-        });
+        this.remove('facet');
         return this;
     }
 
