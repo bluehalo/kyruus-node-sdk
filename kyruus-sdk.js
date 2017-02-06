@@ -298,7 +298,7 @@ class Kyruus {
     search(searchString = '', path = 'providers') {
         let options = {
             hostname: this.endpoint,
-            path: this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : searchString + '?') : '')
+            path: this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : '?' + searchString ) : '')
         };
 
         return this._refreshToken().then(() => this._https(this._generateDefaultOptions(options)));
