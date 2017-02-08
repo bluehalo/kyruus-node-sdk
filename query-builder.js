@@ -36,7 +36,7 @@ class k {
     }
 
     static get SPECIALTYSYNONYM() {
-        return 'specialty.synonym';
+        return 'specialtysynonym';
     }
 
     static get CLINICALEXPERIENCE() {
@@ -509,12 +509,8 @@ class k {
      * @param {...object} keyValues - key value pairs to add. Key being the additional filter, and value being the string value on what to filter on.
      * @return {k}
      */
-    with(...keyValues) {
-        _.forEach(keyValues, (value) => {
-            _.forIn(value, (value, key) => {
-                this.filterOther(this._currentFilter, `${key}:${value}`, '^');
-            });
-        });
+    with(field, value) {
+        this.filterOther(this._currentFilter, `${field}:${value}`, '^');
         return this;
     }
 

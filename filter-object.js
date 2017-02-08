@@ -87,13 +87,7 @@ class FilterObject {
      * @return {string}
      */
     append(value) {
-        if (value instanceof FilterObject && value.checkType(this._type)) {
-            this._value = _.union(value._value, this._value);
-        }
-        else {
-            this._value.push(value);
-        }
-
+        this._value.push(value);
         return this;
     }
     /**
