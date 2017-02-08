@@ -156,6 +156,17 @@ class k {
     }
 
     /**
+     * @function isEncoded
+     * @summary Checks if input string is already encoded.
+     * @param {string} uri
+     * @return {k}
+     */
+    // Figure out of this is correct
+    isEncoded(uri = '') {
+        return uri !== decodeURIComponent(uri);
+    }
+
+    /**
      * @function unified
      * @summary Changes the vector to a unified vector and assigns the given value to the vector
      * @param {string} unified - value for the unified
@@ -163,6 +174,9 @@ class k {
      */
     // Figure out of this is correct
     unified(unified) {
+        if (!this.isEncoded(unified)) {
+            unified = encodeURIComponent(unified);
+        }
         return this.vector(k.UNIFIED, unified);
     }
 
@@ -178,6 +192,10 @@ class k {
      * @return {k}
      */
     filterOther(field, value, conjunction = 'or') {
+        if (!this.isEncoded(value)) {
+            value = encodeURIComponent(value);
+        }
+
         if (this._filter[field]) {
             if (this._filter[field].checkType(conjunction)) {
                 this._filter[field].append(value);
@@ -557,25 +575,29 @@ class k {
         return this.remove('sort');
     }
 
+
     /**
-     * @function facet
-     * @summary Adds a field to facet results by
-     * @param {string} seed - Field to facet by
+     * @function facets
+     * @summary Adds facets to query
+     * @param {...string} facets - facets to add
      * @return {k}
      */
-    facet(facets) {
-        return this.param('facet', facets);
+    facets(...facets) {
+        _.forEach(facets, (facet) => {
+            this.param('facet', facet);
+        });
+        return this;
     }
 
     /**
-     * @function removeFacet
-     * @summary Removes facets on search results
+     * @function removeFacets
+     * @summary Removes facets from query
      * @return {k}
      */
-    removeFacet() {
-        return this.remove('facet');
+    removeFacets() {
+        this.remove('facet');
+        return this;
     }
-
 
     /**
      * @function pageSize
@@ -638,7 +660,14 @@ class k {
             }
         }
         _.forIn(this._params, (val, key) => {
-            addQueryParam(val, key);
+            if (_.isArray(val)) {
+                _.each(val, (v) => {
+                    addQueryParam(v, key);
+                });
+            }
+            else {
+                addQueryParam(val, key);
+            }
         });
         let vectorKey = _.get(this,'_vector[field]', null);
         let vectorValue = _.get(this,'_vector[value]', null);
