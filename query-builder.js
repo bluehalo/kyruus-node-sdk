@@ -90,7 +90,13 @@ class k {
         this._location = {location: location, distance: distance};
         return this;
     }
-    removeLocation(locatio, distance) {
+
+    /**
+     * @function removeLocation
+     * @summary Removes the location while maintaining the location format
+     * @return {k}
+     */
+    removeLocation() {
         this._location = {location: null, distance: null};
         return this;
     }
