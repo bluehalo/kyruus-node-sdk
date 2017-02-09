@@ -244,17 +244,6 @@ class k {
      * @return {k}
      */
     removeFromFilter(field, value) {
-        this.deleteFromFilter(field, value);
-    }
-
-    /**
-     * @function deleteFromFilter
-     * @summary Removes a value from a filter
-     * @param {string} field - filter field
-     * @param {string} value - value to remove from filter
-     * @return {k}
-     */
-    deleteFromFilter(field, value) {
         if(this._filter[field] instanceof FilterObject) {
             this._filter[field].remove(value);
             if (this._filter[field].size() === 0) {
@@ -265,22 +254,12 @@ class k {
     }
 
     /**
-     * @function removeFilter
+     * @function remove
      * @summary Removes a field from the query
      * @param {string} field - field to remove
      * @return {k}
      */
     remove(field) {
-        return this.delete(field);
-    }
-
-    /**
-     * @function deleteFilter
-     * @summary Removes a field from the query
-     * @param {string} field - field to remove
-     * @return {k}
-     */
-    delete(field) {
         delete this._filter[field];
         delete this._params[field];
         if (this._vector.field === field) {

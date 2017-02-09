@@ -32,22 +32,12 @@ class FilterObject {
     }
 
     /**
-     * @function remove
-     * @summary Removes the value from the filter
-     * @param {string} value - value to remove
-     * @return {string}
-     */
-    remove(value) {
-        this.delete(value);
-    }
-
-    /**
      * @function delete
      * @summary Removes the value from the filter
      * @param {string} value - value to remove
      * @return {string}
      */
-    delete(value) {
+    remove(value) {
         _.forEach(this._value, (val) => {
             if (val instanceof FilterObject) {
                 val.remove(value);

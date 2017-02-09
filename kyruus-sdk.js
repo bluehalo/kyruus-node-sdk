@@ -435,12 +435,6 @@ class Kyruus {
             req.end();
         });
     }
-
-    /**
-     *
-     *
-     */
-
 }
 
 module.exports =  Kyruus;
