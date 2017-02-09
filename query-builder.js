@@ -52,12 +52,6 @@ class k {
     }
 
     constructor(api = null) {
-        // The filter structure will be a query tree
-        //              and
-        //         /                  \
-        //        ^                   or
-        //   /          \          /       \
-        // AcceptsNew Primary  Laruel   Columbia
         this._filter = {};
 
         // Kyruus only allows for one vector object, this vector object will enforce that
@@ -195,6 +189,7 @@ class k {
      * @summary Adds
      * @param {string} field - what filter to add the value to
      * @param {string} value - what to value to filter against in the field
+     * @param {string} conjunction - conjuction symbol to seperate filters by. Default is 'or'. Other option is '^'
      * @return {k}
      */
     filterOther(field, value, conjunction = 'or') {
@@ -212,7 +207,7 @@ class k {
             }
         }
         else {
-            this._filter[field] = new FilterObject(value);;
+            this._filter[field] = new FilterObject(value, conjunction);
         }
 
         this._currentFilter = field;
@@ -221,9 +216,10 @@ class k {
     }
 
     /**
-     * @function removeFilter
-     * @summary Removes a field from the query
-     * @param {string} field - field to remove
+     * @function param
+     * @summary Adds an additional parameter to the query
+     * @param {string} field - parameter key/field
+     * @param {string} value - value of the parameter
      * @return {k}
      */
     param(field, value) {
@@ -233,8 +229,7 @@ class k {
 
     /**
      * @function clearVector
-     * @summary Removes a field from the query
-     * @param {string} field - field to remove
+     * @summary Resets vector to its empty format
      * @return {k}
      */
     clearVector() {
