@@ -536,9 +536,24 @@ class k {
        return this.remove('shuffle_seed');
    }
 
-    /*
-     * Search sorting and page selection
+    /**
+     * @function sort
+     * @summary Adds a field to sort results by
+     * @param {string} seed - Field to sort by
+     * @return {k}
      */
+    sort(field) {
+        return this.param('sort', field);
+    }
+
+    /**
+     * @function removeSort
+     * @summary Removes sorting on search results
+     * @return {k}
+     */
+    removeSort() {
+        return this.remove('sort');
+    }
 
      /**
       * @function debug
@@ -559,24 +574,24 @@ class k {
        return this.remove('debug');
    }
 
-    /**
-     * @function sort
-     * @summary Adds a field to sort results by
-     * @param {string} seed - Field to sort by
-     * @return {k}
-     */
-    sort(field) {
-        return this.param('sort', field);
+     /**
+      * @function fields
+      * @summary specify fields to return
+      * @param {value} value - boolean
+      * @return {k}
+      */
+    fields(value) {
+        return this.param('fields', value);
     }
 
     /**
-     * @function removeSort
-     * @summary Removes sorting on search results
+     * @function removeDebug
+     * @summary Removes debug
      * @return {k}
      */
-    removeSort() {
-        return this.remove('sort');
-    }
+   removeFields() {
+       return this.remove('fields');
+   }
 
 
     /**

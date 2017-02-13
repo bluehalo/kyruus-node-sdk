@@ -290,6 +290,16 @@ class Kyruus {
     }
 
     /**
+     * @function getPath
+     * @summary Does a generic search with the parameters provided if any
+     * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
+     * @return {Promise.<KyruusProviderSearch>|*}
+     */
+    getPath(searchString = '', path = 'providers') {
+       return this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : '?' + searchString ) : '');
+    }
+
+    /**
      * @function search
      * @summary Does a generic search with the parameters provided if any
      * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
@@ -301,7 +311,7 @@ class Kyruus {
         }
         let options = {
             hostname: this.endpoint,
-            path: this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : '?' + searchString ) : '')
+            path: this.getPath(searchString, path)
         };
         return this._refreshToken().then(() => this._https(this._generateDefaultOptions(options)));
     }
