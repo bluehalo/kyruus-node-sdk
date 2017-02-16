@@ -169,7 +169,7 @@ class k {
         }
 	}
 
-    /**
+	/**
 	 * @function encode
 	 * @summary encodes uri if it's not already encoded.
 	 * @param {string} uri
