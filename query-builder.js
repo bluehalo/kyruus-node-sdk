@@ -162,11 +162,11 @@ class k {
 	 * @return {k}
 	 */
 	isEncoded(uri = '') {
-	    try {
-		    return uri !== decodeURIComponent(uri);
-        } catch(err) {
-            return false;
-        }
+		try {
+			return uri !== decodeURIComponent(uri);
+		} catch(err) {
+			return false;
+		}
 	}
 
 	/**
