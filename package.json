@@ -21,7 +21,7 @@
   "main": "kyruus-sdk.js",
   "scripts": {
     "mocha": "mocha",
-    "test": "mocha"
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec"
   },
   "dependencies": {
     "gulp": "^3.9.1",
@@ -32,6 +32,7 @@
     "gulp-rename": "~1.2.2",
     "gulp-shell": "^0.5.2",
     "gulp-util": "^3.0.7",
+    "istanbul": "^0.4.5",
     "jsdoc": "^3.4.0",
     "lodash": "^4.17.2"
   },

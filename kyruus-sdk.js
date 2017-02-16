@@ -4,6 +4,8 @@ const https = require('https'),
     q = require('q'),
     _ = require('lodash');
 
+const k = require('./query-builder.js');
+
 // Type Definitions
 // TODO find meaning of TBD Objects
 /**
@@ -214,6 +216,8 @@ class Kyruus {
         return `/pm/${this.version}/${this.source}/`;
     }
 
+
+
     /**
      * @function getProviderByNpi
      * @summary return a kyruus doctor object searched by npi
@@ -286,19 +290,40 @@ class Kyruus {
     }
 
     /**
+     * @function getPath
+     * @summary Does a generic search with the parameters provided if any
+     * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
+     * @return {Promise.<KyruusProviderSearch>|*}
+     */
+    getPath(searchString = '', path = 'providers') {
+       return this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : '?' + searchString ) : '');
+    }
+
+    /**
      * @function search
      * @summary Does a generic search with the parameters provided if any
      * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
      * @return {Promise.<KyruusProviderSearch>|*}
      */
     search(searchString = '', path = 'providers') {
+        if(typeof(searchString) !== 'string' ) {
+            searchString = `${searchString}`;
+        }
         let options = {
             hostname: this.endpoint,
-            path: this.__rootQueryPath() + path + (searchString.length ? '?' + searchString : '')
+            path: this.getPath(searchString, path)
         };
-
         return this._refreshToken().then(() => this._https(this._generateDefaultOptions(options)));
     }
+
+    /**
+     * @function query
+     * @summary returns a new query builder to start using
+     * @return {k}
+     */
+     query() {
+         return new k(this);
+     }
 
     /**
      * @function _refreshToken
@@ -328,7 +353,7 @@ class Kyruus {
                 "content-type": "multipart/form-data; boundary=" + separator,
                 "cache-control": "no-cache"
             }};
-        
+
         separator = '--' + separator;
 
         // This is the body of the form request Kyruus uses to login
