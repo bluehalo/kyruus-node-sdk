@@ -161,9 +161,25 @@ class k {
 	 * @param {string} uri
 	 * @return {k}
 	 */
-	// Figure out of this is correct
 	isEncoded(uri = '') {
-		return uri !== decodeURIComponent(uri);
+		try {
+			return uri !== decodeURIComponent(uri);
+		} catch(err) {
+			return false;
+		}
+	}
+
+	/**
+	 * @function encode
+	 * @summary encodes uri if it's not already encoded.
+	 * @param {string} uri
+	 * @return {k}
+	 */
+	encode(uri = '') {
+	    if (!this.isEncoded(uri)) {
+	        uri = encodeURIComponent(uri);
+	    }
+	    return uri;
 	}
 
 	/**
@@ -174,10 +190,7 @@ class k {
 	 */
 	// Figure out of this is correct
 	unified(unified) {
-		if (!this.isEncoded(unified)) {
-			unified = encodeURIComponent(unified);
-		}
-		return this.vector(k.UNIFIED, unified);
+		return this.vector(k.UNIFIED, this.encode(unified));
 	}
 
 	/*
@@ -193,9 +206,7 @@ class k {
 	 * @return {k}
 	 */
 	filterOther(field, value, conjunction = 'or') {
-		if (!this.isEncoded(value)) {
-			value = encodeURIComponent(value);
-		}
+		value = this.encode(value);
 
 		if (this._filter[field]) {
 			if (this._filter[field].checkType(conjunction)) {
@@ -223,7 +234,7 @@ class k {
 	 * @return {k}
 	 */
 	param(field, value) {
-		this._params[field] = value;
+		this._params[field] = this.encode(value);
 		return this;
 	}
 
@@ -246,7 +257,7 @@ class k {
 	 */
 	removeFromFilter(field, value) {
 		if(this._filter[field] instanceof FilterObject) {
-			this._filter[field].remove(value);
+			this._filter[field].remove(this.encode(value));
 			if (this._filter[field].size() === 0) {
 				delete this._filter[field];
 			}

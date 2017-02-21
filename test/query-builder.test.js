@@ -21,7 +21,7 @@ describe('Kyruus Query Builder', () => {
             should.exist(queryBuilder._filter);
         });
     });
-    let filterTestString = 'YqmNuEMKZwb4Ih30Q8h0bAIJ622csxPv0gptSZxnzHVSYkTg5rJxZnx0oGfgpgnFvkWWZcF5FgnhG3rSbUX75fojB6wky7WwpcsEfIlh806YTugkn3xrnTTpjqzmIO'.split('');
+    let filterTestString = 'YqmNuEMKZwb4Ih30Q8h0bAIJ622csxPv0gptSZxnzHVSYkTg5rJxZnx0oGfgpgnFvkWWZcF5FgnhG3rSbUX75fojB6wky7WwpcsEfIlh806YTugkn3xrnTTpjqzmIO |/!@#$%^&*()=+,./<>?;'.split('');
     const multiFilterTests = [['npi', 'npis'],
                         ['locations.name', 'locationNames'],
                         ['specialties.specialty.untouched', 'specialties'],
@@ -36,6 +36,7 @@ describe('Kyruus Query Builder', () => {
     const parameterTests = [['shuffle_seed', 'shuffle'],
                             ['sort','sort'],
                             ['debug','debug'],
+                            ['fields', 'fields'],
                             ['per_page', 'pageSize'],
                             ['page', 'pageNumber'],
                             ['facet', 'facets']];
@@ -97,7 +98,7 @@ describe('Kyruus Query Builder', () => {
                 });
                 it(`should format npi filter pipes`, () => {
                     queryBuilder[func](val1, val2);
-                    should(`${queryBuilder}`.indexOf(`filter=${field}:${val1}|${val2}`)).be.greaterThan(0);
+                    should(`${queryBuilder}`.indexOf(`filter=${field}:${encodeURIComponent(val1)}|${encodeURIComponent(val2)}`)).be.greaterThan(0);
                 });
             });
         };
@@ -167,13 +168,13 @@ describe('Kyruus Query Builder', () => {
                 });
                 it(`should have ${field} field`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._params).have.key(field);
+                    should(queryBuilder._params).have.key(encodeURIComponent(field));
                 });
                 it(`${field} parameter should be overwritten`, () => {
                     queryBuilder[func](val1);
-                    should(queryBuilder._params[field]).be.equal(val1);
+                    should(queryBuilder._params[field]).be.equal(encodeURIComponent(val1));
                     queryBuilder[func](val2);
-                    should(queryBuilder._params[field]).be.equal(val2);
+                    should(queryBuilder._params[field]).be.equal(encodeURIComponent(val2));
                 });
                 it(`${field} should not exist after remove`, () => {
                     queryBuilder[func](val1);
@@ -186,7 +187,7 @@ describe('Kyruus Query Builder', () => {
                 });
                 it(`query should contain ${field} param`, () => {
                     queryBuilder[func](val1);
-                    should(`${queryBuilder}`.indexOf(`${field}=${val1}`)).be.greaterThan(0);
+                    should(`${queryBuilder}`.indexOf(`${field}=${encodeURIComponent(val1)}`)).be.greaterThan(0);
                 });
             });
         };
