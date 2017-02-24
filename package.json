@@ -5,9 +5,10 @@
   "contributors": [
     "Bryan Young <byoung@asymmetrik.com>",
     "Peter Grasso <pgrasso@asymmetrik.com>"
+    "Christine Lu <clu@asymmetrik.com>"
   ],
-  "license": "SEE LICENSE IN LICENSE",
-  "version": "0.0.1",
+  "license": "MIT",
+  "version": "0.1.0",
   "readme": "README.md",
   "engines": {
     "node": "6.x.x",
