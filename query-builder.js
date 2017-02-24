@@ -107,6 +107,8 @@ class k {
 	 * @return {k}
 	 */
 	vector(field, value) {
+		field = this.encode(field);
+		value = this.encode(value);
 		this._vector.field = field;
 		this._vector.value = value;
 		return this;
