@@ -1,5 +1,5 @@
 {
-  "name": "kyruus",
+  "name": "@asymmetrik/kyruus-node-sdk",
   "description": "Node Request-based API wrapper for the Kyruus API",
   "author": "Asymmetrik Ltd. (https://asymmetrik.com)",
   "contributors": [
