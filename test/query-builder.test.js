@@ -35,7 +35,6 @@ describe('Kyruus Query Builder', () => {
 
     const parameterTests = [['shuffle_seed', 'shuffle'],
                             ['sort','sort'],
-                            ['debug','debug'],
                             ['fields', 'fields'],
                             ['per_page', 'pageSize'],
                             ['page', 'pageNumber'],
