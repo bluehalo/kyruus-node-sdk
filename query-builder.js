@@ -567,25 +567,6 @@ class k {
 	}
 
 	 /**
-	 * @function debug
-	 * @summary toggle debug values
-	 * @param {value} value - boolean
-	 * @return {k}
-	 */
-	debug(value) {
-		return this.param('debug', value);
-	}
-
-	/**
-	 * @function removeDebug
-	 * @summary Removes debug
-	 * @return {k}
-	 */
-	removeDebug() {
-		return this.remove('debug');
-	}
-
-	 /**
 	 * @function fields
 	 * @summary specify fields to return
 	 * @param {value} value - boolean
