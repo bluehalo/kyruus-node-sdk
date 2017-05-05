@@ -61,8 +61,29 @@ class k {
 
 		this._currentFilter = '';
 
+        if(api instanceof k)
+            return this.__clone(api);
+
 		//function to run search queries on
 		this._api = api;
+	}
+
+    /**
+	 * @summary Clones query builder
+     * @param _k {k}
+     * @private
+     */
+	__clone(_k){
+		for(let key in _k) {
+            if (key === '_filter') {
+                for (let filter in _k[key])
+                    if (_k[key][filter] instanceof FilterObject)
+                        this[key][filter] = new FilterObject(_k[key]);
+            }
+            else if (typeof _k[key] != 'function') {
+                this[key] = _.cloneDeep(_k[key]);
+            }
+        }
 	}
 
 	get filter() {
