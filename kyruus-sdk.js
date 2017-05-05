@@ -8,14 +8,14 @@ const k = require('./query-builder.js');
 
 const {
 	KyruusFacet,
-    KyruusGeoCode,
-    KyruusLocation,
-    KyruusProvider,
-    KyruusProviderSearch,
-    KyruusSuggestions,
-    KyruusSuggestionData,
-    KyruusTypeAheadObject,
-    KyruusTypeAhead
+	KyruusGeoCode,
+	KyruusLocation,
+	KyruusProvider,
+	KyruusProviderSearch,
+	KyruusSuggestions,
+	KyruusSuggestionData,
+	KyruusTypeAheadObject,
+	KyruusTypeAhead
 } = require('./data');
 
 
