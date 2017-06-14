@@ -293,25 +293,30 @@ class Kyruus {
 	 * @function getPath
 	 * @summary Does a generic search with the parameters provided if any
 	 * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
+	 * @param {string} [path=''] path - path to be appended to the root query path
+	 * @param {string} [override=''] override - optional override parameter to override rootQueryPath + path
 	 * @return {Promise.<KyruusProviderSearch>|*}
 	 */
-	getPath(searchString = '', path = 'providers') {
-		return this.__rootQueryPath() + path + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : '?' + searchString ) : '');
+	getPath(searchString = '', path = 'providers', override = '') {
+		const base = override ? override : this.__rootQueryPath() + path;
+		return base + (searchString.length ? (searchString.charAt(0) === '?' ? searchString : '?' + searchString ) : '');
 	}
 
 	/**
 	 * @function search
 	 * @summary Does a generic search with the parameters provided if any
 	 * @param {string} [searchString=''] searchString - encoded filter string to send to Kyruus
+	 * @param {string} [path=''] path - path to be appended to the root query path
+	 * @param {string} [override=''] override - optional override parameter to override rootQueryPath + path
 	 * @return {Promise.<KyruusProviderSearch>|*}
 	 */
-	search(searchString = '', path = 'providers') {
+	search(searchString = '', path = 'providers', override = '') {
 		if(typeof(searchString) !== 'string' ) {
 			searchString = `${searchString}`;
 		}
 		let options = {
 			hostname: this.endpoint,
-			path: this.getPath(searchString, path)
+			path: this.getPath(searchString, path, override)
 		};
 		return this._refreshToken().then(() => this._https(this._generateDefaultOptions(options)));
 	}

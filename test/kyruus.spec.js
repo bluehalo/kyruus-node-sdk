@@ -18,7 +18,6 @@ describe('Kyruus SDK', () => {
             kyruuuuuus(q.reject('Bad Request'));
 
             return Kyruus._refreshToken().then((result) => {
-                console.log(result);
                 return q.reject('It logged in');
             }, (err) => {
                 return q.resolve(err);
@@ -29,6 +28,28 @@ describe('Kyruus SDK', () => {
             kyruuuuuus(q({expires_in: 3600}));
             return Kyruus._refreshToken();
         });
+    });
+    
+    describe('getPath', () => {
+      
+      it('should allow for an override path to be specified', () => {
+        const searchString = '';
+        const path = '';
+        const override = '/my/imaginary/root/path';
+        
+        const result = Kyruus.getPath(searchString, path, override);
+        should(result).equal(override);
+      });
+      
+      it('should default to the rootQueryPath + path if no override is specified', () => {
+        const searchString = '?foo';
+        const path = 'providers';
+        const expected = `${Kyruus.__rootQueryPath()}${path}${searchString}`;
+        
+        const result = Kyruus.getPath(searchString, path);
+        should(result).equal(expected);
+      });
+      
     });
 
     describe('Kyruus SDK logged in tests', () => {
