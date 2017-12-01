@@ -12,8 +12,8 @@
   "version": "0.1.1",
   "readme": "README.md",
   "engines": {
-    "node": "6.x.x",
-    "npm": "3.x.x"
+    "node": "8.x.x",
+    "npm": "5.x.x"
   },
 
   "repository": {
