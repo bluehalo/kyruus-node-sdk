@@ -12,31 +12,26 @@
   "version": "0.1.1",
   "readme": "README.md",
   "engines": {
-    "node": "6.x.x",
-    "npm": "3.x.x"
+    "node": ">=6.x.x <=8.x.x",
+    "npm": ">=3.x.x <=5.x.x"
   },
-
   "repository": {
-     "type": "git",
-     "url": "https://github.com/Asymmetrik/kyruus-node-sdk.git"
+    "type": "git",
+    "url": "https://github.com/Asymmetrik/kyruus-node-sdk.git"
   },
-
   "keywords": [
     "kyruus",
     "rest",
     "api"
   ],
-
   "main": "kyruus-sdk.js",
   "scripts": {
     "mocha": "mocha",
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec"
   },
-
   "peerDependencies": {
     "lodash": "4.x"
   },
-
   "devDependencies": {
     "chai": "^1.10.0",
     "chai-as-promised": "^4.1.1",
