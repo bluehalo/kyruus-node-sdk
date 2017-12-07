@@ -9,7 +9,7 @@
   ],
   "copyright": "Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.",
   "license": "MIT",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "readme": "README.md",
   "engines": {
     "node": ">=6.x.x <=8.x.x",
