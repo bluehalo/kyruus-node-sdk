@@ -283,4 +283,34 @@ describe('Kyruus Query Builder', () => {
             should(`${queryBuilder}`.indexOf('e=g')).be.greaterThan(0);
         });
     });
+
+    describe('Mutability', () => {
+        it('should not mutate previous query', () => {
+            const a = queryBuilder.specialties('one', 'two');
+            const b = new k(queryBuilder);
+
+            should(a === b).be.false();
+            b.specialties('three');
+            a.specialties('four');
+
+            should(`${a}`.indexOf('three')).be.equal(-1);
+            should(`${b}`.indexOf('three')).be.greaterThan(0);
+
+            should(`${b}`.indexOf('four')).be.equal(-1);
+            should(`${a}`.indexOf('four')).be.greaterThan(0);
+        });
+
+        it('should not mutate filter objects', () => {
+            const a = queryBuilder.specialties('one', 'two').filterOther('filta', 'val');
+            const b = new k(queryBuilder);
+
+            b.filterOther('filta', 'lav');
+
+            should(`${a}`.indexOf('lav')).be.equal(-1);
+            should(`${a}`.indexOf('val')).be.greaterThan(0);
+
+            should(`${b}`.indexOf('val')).be.equal(-1);
+            should(`${b}`.indexOf('lav')).be.greaterThan(0);
+        });
+    });
 });

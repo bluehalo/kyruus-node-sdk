@@ -12,6 +12,20 @@ class FilterObject {
 		if (! _.isArray(this._value)) value = [value];
 		this._value = value;
 		this.setType(type);
+
+        if(value instanceof FilterObject)
+            return this.__clone(value);
+	}
+
+    /**
+	 * @summary Deep clones filter objects
+     * @param obj {FilterObject}
+     * @private
+     */
+	__clone(obj){
+        for(let key in obj)
+            if(typeof obj[key] != 'function')
+                this[key] = _.cloneDeep(obj[key]);
 	}
 	/**
 	 * @function getType
